@@ -1,0 +1,9 @@
+name: CobaltServer
+version: '${project.version}'
+main: se.fusion1013.plugin.cobaltserver.CobaltServer
+api-version: 1.18
+authors:
+  - Fusion1013
+description: The Cobalt Server Plugin
+depend:
+  - CommandAPI
