@@ -5,7 +5,6 @@ import dev.jorel.commandapi.arguments.StringArgument;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import se.fusion1013.plugin.cobaltcore.locale.Message;
 import se.fusion1013.plugin.cobaltcore.manager.LocaleManager;
 import se.fusion1013.plugin.cobaltcore.util.StringPlaceholders;
 import se.fusion1013.plugin.cobaltcore.util.StringUtil;
@@ -71,13 +70,13 @@ public class WarpCommand {
                 .addPlaceholder("name", name).build();
 
         if (warps.size() == 0){
-            localeManager.sendMessage(player, new Message("commands.warp.error.warp_not_found").setPrefix("prefix.server"));
+            localeManager.sendMessage(CobaltServer.getInstance(), player, "commands.warp.error.warp_not_found", namePlaceholder);
             return;
         }
 
         Warp highestPriorityWarp = warps.get(0);
 
-        localeManager.sendMessage(player, new Message("commands.warp.teleport.success").setPrefix("prefix.server"), namePlaceholder);
+        localeManager.sendMessage(CobaltServer.getInstance(), player, "commands.warp.teleport.success", namePlaceholder);
         player.teleport(highestPriorityWarp.getLocation());
     }
 
@@ -97,14 +96,14 @@ public class WarpCommand {
 
         // Check if the name is an alphanumerical word
         if (!StringUtil.isWord(name)){
-            localeManager.sendMessage(player, new Message("commands.warp.create.error.invalid_name").setPrefix("prefix.server"), namePlaceholder);
+            localeManager.sendMessage(CobaltServer.getInstance(), player, "commands.warp.create.error.invalid_name", namePlaceholder);
             return;
         }
 
         // Check if warp with the same name already exists
         for (Warp warp : currentWarps){
             if (warp.getName().equalsIgnoreCase(name)){
-                localeManager.sendMessage(player, new Message("commands.warp.create.error.name_already_exists").setPrefix("prefix.server"), namePlaceholder);
+                localeManager.sendMessage(CobaltServer.getInstance(), player, "commands.warp.create.error.name_already_exists", namePlaceholder);
                 return;
             }
         }
@@ -113,7 +112,7 @@ public class WarpCommand {
         Warp warp = new Warp(name, player.getUniqueId(), player.getLocation());
         DatabaseHook.insertWarp(warp);
 
-        localeManager.sendMessage(player, new Message("commands.warp.create.info.created_warp").setPrefix("prefix.server"), namePlaceholder);
+        localeManager.sendMessage(CobaltServer.getInstance(), player, "commands.warp.create.info.created_warp", namePlaceholder);
     }
 
     /**
@@ -135,13 +134,13 @@ public class WarpCommand {
                 .addPlaceholder("name", name).build();
 
         if (warps.size() == 0){
-            localeManager.sendMessage(player, new Message("commands.warp.error.warp_not_found").setPrefix("prefix.server"));
+            localeManager.sendMessage(CobaltServer.getInstance(), player, "commands.warp.error.warp_not_found", namePlaceholder);
             return;
         }
 
         Warp highestPriorityWarp = warps.get(0);
         if (warps.size() == 1 || highestPriorityWarp.getOwner().equals(pID)){
-            localeManager.sendMessage(player, new Message("commands.warp.info.header").setPrefix("prefix.server"), namePlaceholder);
+            localeManager.sendMessage(CobaltServer.getInstance(), player, "commands.warp.info.header", namePlaceholder);
 
             Location loc = highestPriorityWarp.getLocation();
 
@@ -149,25 +148,23 @@ public class WarpCommand {
             StringPlaceholders pOwner = StringPlaceholders.builder()
                     .addPlaceholder("owner", Bukkit.getPlayer(highestPriorityWarp.getOwner()).getDisplayName())
                     .build();
-            localeManager.sendMessage(player, new Message("commands.warp.info.detail.owner").setPrefix("prefix.server"), pOwner);
+            localeManager.sendMessage("", player, "commands.warp.info.detail.owner", pOwner);
             StringPlaceholders pWorld = StringPlaceholders.builder()
                     .addPlaceholder("world", loc.getWorld().getName())
                     .build();
-            localeManager.sendMessage(player, new Message("commands.warp.info.detail.world").setPrefix("prefix.server"), pWorld);
+            localeManager.sendMessage("", player, "commands.warp.info.detail.world", pWorld);
             StringPlaceholders pLocation = StringPlaceholders.builder()
-                    .addPlaceholder("x", highestPriorityWarp.getShortX())
-                    .addPlaceholder("y", highestPriorityWarp.getShortY())
-                    .addPlaceholder("z", highestPriorityWarp.getShortZ())
+                    .addPlaceholder("location", highestPriorityWarp.getLocation())
                     .build();
-            localeManager.sendMessage(player, new Message("commands.warp.info.detail.location").setPrefix("prefix.server"), pLocation);
+            localeManager.sendMessage("", player, "commands.warp.info.detail.location", pLocation);
             StringPlaceholders pDistance = StringPlaceholders.builder()
                     .addPlaceholder("distance", (double)Math.round(player.getLocation().distance(loc)*100)/100)
                     .build();
-            localeManager.sendMessage(player, new Message("commands.warp.info.detail.distance").setPrefix("prefix.server"), pDistance);
+            localeManager.sendMessage("", player, "commands.warp.info.detail.distance", pDistance);
             StringPlaceholders pPrivacy = StringPlaceholders.builder()
                     .addPlaceholder("privacy", highestPriorityWarp.getPrivacyLevel().name())
                     .build();
-            localeManager.sendMessage(player, new Message("commands.warp.info.detail.privacy").setPrefix("prefix.server"), pPrivacy);
+            localeManager.sendMessage("", player, "commands.warp.info.detail.privacy", pPrivacy);
         }
     }
 
@@ -202,9 +199,9 @@ public class WarpCommand {
                 .build();
 
         if (deletedWarps > 0){
-            localeManager.sendMessage(player, new Message("commands.warp.delete.deleted_warps").setPrefix("prefix.server"), namePlaceholder);
+            localeManager.sendMessage(CobaltServer.getInstance(), player, "commands.warp.delete.deleted_warps", namePlaceholder);
         } else {
-            localeManager.sendMessage(player, new Message("commands.warp.error.warp_not_found").setPrefix("prefix.server"), namePlaceholder);
+            localeManager.sendMessage(CobaltServer.getInstance(), player, "commands.warp.error.warp_not_found", namePlaceholder);
         }
     }
 
@@ -218,17 +215,16 @@ public class WarpCommand {
         LocaleManager localeManager = LocaleManager.getInstance();
 
         List<Warp> warps = DatabaseHook.getWarps();
+        if (warps == null) return;
 
-        localeManager.sendMessage(player, new Message("commands.warp.list.header").setPrefix("prefix.server"));
+        localeManager.sendMessage(CobaltServer.getInstance(), player, "commands.warp.list.header");
         for (Warp w : warps){
             StringPlaceholders placeholders = StringPlaceholders.builder()
                     .addPlaceholder("name", w.getName())
-                    .addPlaceholder("x", w.getShortX())
-                    .addPlaceholder("y", w.getShortY())
-                    .addPlaceholder("z", w.getShortZ())
+                    .addPlaceholder("location", w.getLocation())
                     .addPlaceholder("world", w.getLocation().getWorld().getName())
                     .build();
-            localeManager.sendMessage(player, new Message("commands.warp.list.entry").setPrefix("prefix.server"), placeholders);
+            localeManager.sendMessage("", player, "commands.warp.list.entry", placeholders);
         }
     }
 }

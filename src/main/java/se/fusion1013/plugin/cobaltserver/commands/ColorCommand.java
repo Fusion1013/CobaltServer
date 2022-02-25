@@ -1,8 +1,8 @@
 package se.fusion1013.plugin.cobaltserver.commands;
 
 import dev.jorel.commandapi.CommandAPICommand;
-import se.fusion1013.plugin.cobaltcore.locale.Message;
 import se.fusion1013.plugin.cobaltcore.manager.LocaleManager;
+import se.fusion1013.plugin.cobaltserver.CobaltServer;
 
 public class ColorCommand {
     public static void register(){
@@ -14,10 +14,10 @@ public class ColorCommand {
                 .executesPlayer((sender, args) -> {
                     LocaleManager localeManager = LocaleManager.getInstance();
 
-                    localeManager.sendMessage(sender, new Message("commands.colors.header").setPrefix("cobalt.server"));
-                    localeManager.sendMessage(sender, new Message("commands.colors.color_codes_description").setPrefix(""));
-                    localeManager.sendMessage(sender, new Message("commands.colors.color_codes").setPrefix(""));
-                    localeManager.sendMessage(sender, new Message("commands.colors.formatting_codes").setPrefix(""));
+                    localeManager.sendMessage(CobaltServer.getInstance(), sender, "commands.colors.header");
+                    localeManager.sendMessage("", sender, "commands.colors.color_codes_description");
+                    localeManager.sendMessage("", sender, "commands.colors.color_codes");
+                    localeManager.sendMessage("", sender, "commands.colors.formatting_codes");
                 });
     }
 }

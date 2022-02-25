@@ -6,10 +6,10 @@ import java.util.UUID;
 
 public class Warp {
 
-    private int id;
-    private String name;
-    private UUID owner;
-    private Location location;
+    private final int id;
+    private final String name;
+    private final UUID owner;
+    private final Location location;
     private PrivacyLevel privacyLevel;
 
     public Warp(String name, UUID owner, Location location){
@@ -17,19 +17,13 @@ public class Warp {
         this.name = name;
         this.owner = owner;
         this.location = location;
-        this.privacyLevel = PrivacyLevel.PRIVATE;
+        this.privacyLevel = PrivacyLevel.PUBLIC;
     }
 
     public void setPrivacyLevel(String privacyLevel){
         if (privacyLevel.equalsIgnoreCase("private")) this.privacyLevel = PrivacyLevel.PRIVATE;
         else if (privacyLevel.equalsIgnoreCase("public")) this.privacyLevel = PrivacyLevel.PUBLIC;
     }
-
-    /*
-    public static List<Warp> getWarps(String name, UUID user, ToIntFunction<WarpCommand.WarpOwnerType> sortingFunction, boolean looseMatch, boolean onlyOwned){
-        List<Warp> warpQuery = Cobalt.getInstance().getRDatabase().getWarpByName(name);
-    }
-     */
 
     public int getId() {
         return id;

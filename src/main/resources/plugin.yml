@@ -7,3 +7,6 @@ authors:
 description: The Cobalt Server Plugin
 depend:
   - CommandAPI
+  - CobaltCore
+softdepend:
+  - VanishNoPacket

@@ -1,0 +1,17 @@
+#
+# Main configuration file for CobaltServer
+#
+# ----- ENABLE / DISABLE COMMANDS -----
+#
+enable-broadcast-command: true
+enable-color-command: true
+enable-find-command: true
+enable-gamemode-command: true
+enable-near-command: true
+enable-seen-command: true
+enable-server-command: true
+enable-warp-command: true
+#
+#
+# Resource Pack String
+resource-pack-string: ""

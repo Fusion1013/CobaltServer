@@ -1,0 +1,50 @@
+{
+  "prefix.server": "&7[<g:#00aaaa:#0066aa>Server&7] ",
+
+  "commands.seen.result.offline": "&3%player% &7har varit &4bortkopplad &7i %time%.",
+  "commands.seen.result.online": "&3%player% &7har varit &ainloggad &7i %time%.",
+
+  "commands.find.result.online.same_world": "&3%player% &7är i &3%world% &7i &3%gamemode% &7på koordinaterna %location%. Ditt avstånd till deras position är &b%distance%",
+  "commands.find.result.online.different_world": "&3%player% &7är i &3%world% &7i &3%gamemode% &7på koordinaterna %location%.",
+  "commands.find.result.offline.same_world": "&3%player% &7sågs senast i &3%world% &7i &3%gamemode% &7på koordinaterna %location%. Ditt avstånd till deras senaste position är &b%distance%",
+  "commands.find.result.offline.different_world": "&3%player% &7sågs senast i &3%world% &7i &3%gamemode% &7på koordinaterna %location%.",
+
+  "commands.near.result": "&3%player_count% &7spelare är inom radien &3%range% &7blocks: %players%",
+  "commands.near.fail": "&7Inga spelare hittades inom radien &3%range% &7blocks",
+
+
+  "commands.warp.error.warp_not_found": "&7Warp &3%name% &7not found",
+  "commands.warp.create.error.invalid_name": "&7Invalid Name: &3%name%",
+  "commands.warp.create.error.name_already_exists": "&7Name Already Exists: &3%name%",
+  "commands.warp.create.info.created_warp": "&7Created Warp &3%name%",
+
+  "commands.warp.info.header": "&7Information for Warp &3%name%&7:",
+  "commands.warp.info.detail.owner": "&7Owner: &3%owner%",
+  "commands.warp.info.detail.world": "&7World: &3%world%",
+  "commands.warp.info.detail.location": "&7Location: %location%",
+  "commands.warp.info.detail.distance": "&7Distance: &b%distance% &7blocks",
+  "commands.warp.info.detail.privacy": "&7Privacy: &3%privacy%",
+
+  "commands.warp.list.header": "&7Displaying All Available Warps:",
+  "commands.warp.list.entry": "&3%name% &7- %location% in &3%world%",
+
+  "commands.warp.teleport.success": "&7Teleported to &3%name%",
+
+  "commands.warp.delete.deleted_warps": "&7Deleted &3%count% &7warp(s) with the name &3%name%",
+
+
+  "commands.gamemode.change": "&7Set &3%player_name%&7's gamemode to &3%gamemode%",
+  "commands.gamemode.error.gamemode_not_found": "&7Gamemode &3%gamemode% &7not found",
+
+
+  "commands.broadcast.prefix": "&7[<g:#00aaaa:#0066aa>Broadcast&7] ",
+
+
+  "commands.colors.header": "&7&lColors",
+  "commands.colors.color_codes_description": "&7Usage: <#HEXCODE>, #HEXCODE, &&7FORMAT_CODE, followed by the message",
+  "commands.colors.color_codes": "&7Color Codes: &0&&00 &1&&11 &2&&22 &3&&33 &4&&44 &5&&55 &6&&66 &7&&77 &8&&88 &9&&99 &a&&aa &b&&bb &c&&cc &d&&dd &e&&ee &f&&ff",
+  "commands.colors.formatting_codes": "&7Formatting Codes: &&ll&r&7 &&mm&r&7 &&nn&r&7 &&oo&r&7 &&rr",
+
+  "prefix.discord": "&7[<g:#00aaaa:#0066aa>Discord&7] ",
+  "discord.message": "&7[&3%author%&7] %message%"
+}

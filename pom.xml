@@ -6,7 +6,7 @@
 
     <groupId>se.fusion1013.plugin</groupId>
     <artifactId>cobaltServer</artifactId>
-    <version>0.1</version>
+    <version>0.1.5</version>
     <packaging>jar</packaging>
 
     <name>CobaltServer</name>
@@ -23,8 +23,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.8.1</version>
                 <configuration>
-                    <source>${java.version}</source>
-                    <target>${java.version}</target>
+                    <source>16</source>
+                    <target>16</target>
                 </configuration>
             </plugin>
             <plugin>
@@ -79,6 +79,18 @@
             <artifactId>commandapi-core</artifactId>
             <version>6.4.0</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.DV8FromTheWorld</groupId>
+            <artifactId>JDA</artifactId>
+            <version>v5.0.0-alpha.4</version>
+        </dependency>
+        <dependency>
+            <groupId>se.fusion1013.plugin</groupId>
+            <artifactId>cobaltCore</artifactId>
+            <version>0.1</version>
+            <scope>system</scope>
+            <systemPath>C:/Users/William/Documents/GitHub/CobaltCore/out/artifacts/CobaltCore_jar2/CobaltCore.jar</systemPath>
         </dependency>
     </dependencies>
 </project>

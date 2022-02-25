@@ -5,9 +5,9 @@ import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.arguments.StringArgument;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
-import se.fusion1013.plugin.cobaltcore.locale.Message;
 import se.fusion1013.plugin.cobaltcore.manager.LocaleManager;
 import se.fusion1013.plugin.cobaltcore.util.StringPlaceholders;
+import se.fusion1013.plugin.cobaltserver.CobaltServer;
 
 public class GamemodeCommand {
 
@@ -32,9 +32,9 @@ public class GamemodeCommand {
 
                         if (gameMode != null) {
                             p.setGameMode(gameMode);
-                            localeManager.sendMessage(sender, new Message("commands.gamemode.change").setPrefix("prefix.server"), placeholders);
+                            localeManager.sendMessage(CobaltServer.getInstance(), p, "commands.gamemode.change", placeholders);
                         } else {
-                            localeManager.sendMessage(sender, new Message("commands.gamemode.error.gamemode_not_found").setPrefix("prefix.server"), placeholders);
+                            localeManager.sendMessage(CobaltServer.getInstance(), p, "commands.gamemode.error.gamemode_not_found", placeholders);
                         }
                     }
                 })).register();

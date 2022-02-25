@@ -1,0 +1,6 @@
+#
+# Configuration file for discord connection settings
+#
+# Discord bot token
+discord-token: ""
+#
