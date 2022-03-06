@@ -7,6 +7,15 @@ import se.fusion1013.plugin.cobaltcore.CobaltPlugin;
 import se.fusion1013.plugin.cobaltcore.manager.ConfigManager;
 import se.fusion1013.plugin.cobaltcore.util.PlayerUtil;
 import se.fusion1013.plugin.cobaltserver.commands.*;
+import se.fusion1013.plugin.cobaltserver.commands.info.*;
+import se.fusion1013.plugin.cobaltserver.commands.message.BroadcastCommand;
+import se.fusion1013.plugin.cobaltserver.commands.message.MessageCommand;
+import se.fusion1013.plugin.cobaltserver.commands.self.GamemodeCommand;
+import se.fusion1013.plugin.cobaltserver.commands.self.HatCommand;
+import se.fusion1013.plugin.cobaltserver.commands.self.NicknameCommand;
+import se.fusion1013.plugin.cobaltserver.commands.self.VanishCommand;
+import se.fusion1013.plugin.cobaltserver.commands.teleport.TeleportCommand;
+import se.fusion1013.plugin.cobaltserver.commands.teleport.WarpCommand;
 import se.fusion1013.plugin.cobaltserver.database.DatabaseHook;
 import se.fusion1013.plugin.cobaltserver.discord.commands.DiscordEchoCommand;
 import se.fusion1013.plugin.cobaltserver.discord.commands.DiscordPingCommand;
@@ -15,6 +24,7 @@ import se.fusion1013.plugin.cobaltserver.discord.commands.DiscordUnsubscribeComm
 import se.fusion1013.plugin.cobaltserver.event.PlayerEvents;
 import se.fusion1013.plugin.cobaltserver.manager.*;
 import se.fusion1013.plugin.cobaltserver.settings.ServerSettingsManager;
+import se.fusion1013.plugin.cobaltserver.warp.WarpManager;
 
 /**
  * This plugin contains various tools for server admins
@@ -55,6 +65,7 @@ public final class CobaltServer extends JavaPlugin implements CobaltPlugin {
         CobaltCore.getInstance().getManager(GameManager.class);
         CobaltCore.getInstance().getManager(ResourcePackManager.class);
         CobaltCore.getInstance().getManager(ServerSettingsManager.class);
+        CobaltCore.getInstance().getManager(WarpManager.class);
     }
 
     // ----- DATABASE -----
@@ -84,8 +95,11 @@ public final class CobaltServer extends JavaPlugin implements CobaltPlugin {
         MinecraftDiscordCommand.register();
         GameCommand.register();
         HatCommand.register();
-        // TODO: if (PlayerUtil.isVanishInstalled()) VanishCommand.register();
         if (PlayerUtil.isVanishInstalled()) Bukkit.getPluginCommand("vanish").setExecutor(new VanishCommand()); // TODO: Remove this and use CommandAPI if possible
+        TeleportCommand.register();
+        InvseeCommand.register();
+        EnderchestCommand.register();
+        MessageCommand.register();
 
         // Discord Commands
         DiscordPingCommand.register();
