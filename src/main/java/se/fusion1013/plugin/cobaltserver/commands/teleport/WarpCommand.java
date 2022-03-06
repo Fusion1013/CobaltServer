@@ -1,7 +1,8 @@
-package se.fusion1013.plugin.cobaltserver.commands;
+package se.fusion1013.plugin.cobaltserver.commands.teleport;
 
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.arguments.StringArgument;
+import dev.jorel.commandapi.arguments.TextArgument;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -9,8 +10,8 @@ import se.fusion1013.plugin.cobaltcore.manager.LocaleManager;
 import se.fusion1013.plugin.cobaltcore.util.StringPlaceholders;
 import se.fusion1013.plugin.cobaltcore.util.StringUtil;
 import se.fusion1013.plugin.cobaltserver.CobaltServer;
-import se.fusion1013.plugin.cobaltserver.database.DatabaseHook;
 import se.fusion1013.plugin.cobaltserver.warp.Warp;
+import se.fusion1013.plugin.cobaltserver.warp.WarpManager;
 
 import java.util.List;
 import java.util.UUID;
@@ -20,25 +21,29 @@ public class WarpCommand {
         CommandAPICommand warpListCommand = new CommandAPICommand("list")
                 .withPermission("cobalt.server.command.warp.list")
                 .executesPlayer(WarpCommand::warpList);
-        warpListCommand.register();
 
         CommandAPICommand warpDeleteCommand = new CommandAPICommand("delete")
                 .withPermission("cobalt.server.command.warp.delete")
-                .withArguments(new StringArgument("warp name").replaceSuggestions(info -> getWarpNames()))
+                .withArguments(new TextArgument("warp name").replaceSuggestions(info -> WarpManager.getAllWarpNames()))
                 .executesPlayer(WarpCommand::warpDelete);
-        warpDeleteCommand.register();
 
         CommandAPICommand warpInfoCommand = new CommandAPICommand("info")
                 .withPermission("cobalt.server.command.warp.info")
-                .withArguments(new StringArgument("warp name").replaceSuggestions(info -> getWarpNames()))
+                .withArguments(new StringArgument("warp name").replaceSuggestions(info -> WarpManager.getAllWarpNames()))
                 .executesPlayer(WarpCommand::warpInfo);
-        warpInfoCommand.register();
 
         CommandAPICommand warpCreateCommand = new CommandAPICommand("create")
                 .withPermission("cobalt.server.command.warp.create")
                 .withArguments(new StringArgument("warp name"))
                 .executesPlayer(WarpCommand::warpCreate);
-        warpCreateCommand.register();
+
+        CommandAPICommand warpSetPrivacyCommand = new CommandAPICommand("privacy")
+                .withPermission("cobalt.server.command.warp.privacy")
+                .withArguments(new TextArgument("warp name").replaceSuggestions(info -> WarpManager.getAllWarpNames()))
+                .withArguments(new StringArgument("privacy").replaceSuggestions(info -> WarpManager.getPrivacyNames()))
+                .executesPlayer(WarpCommand::setPrivacy);
+
+        // Register warp and setwarp commands
 
         new CommandAPICommand("warp")
                 .withPermission("cobalt.server.command.warp")
@@ -46,9 +51,35 @@ public class WarpCommand {
                 .withSubcommand(warpDeleteCommand)
                 .withSubcommand(warpInfoCommand)
                 .withSubcommand(warpCreateCommand)
-                .withArguments(new StringArgument("warp name").replaceSuggestions(info -> getWarpNames()))
+                .withSubcommand(warpSetPrivacyCommand)
+                .withArguments(new TextArgument("warp name").replaceSuggestions(info -> WarpManager.getAllWarpNames()))
                 .executesPlayer(WarpCommand::warpTp)
                 .register();
+
+        new CommandAPICommand("setwarp")
+                .withPermission("cobalt.server.command.warp.create")
+                .withArguments(new StringArgument("warp name"))
+                .executesPlayer(WarpCommand::warpCreate).register();
+    }
+
+    private static void setPrivacy(Player player, Object[] args) {
+        String name = (String) args[0];
+        String privacy = (String) args[1];
+        Warp warp = WarpManager.getWarp(player, name);
+
+        StringPlaceholders placeholders = StringPlaceholders.builder()
+                .addPlaceholder("name", name)
+                .addPlaceholder("privacy", privacy)
+                .build();
+
+        if (warp != null) {
+            boolean set = WarpManager.setWarpPrivacy(player, name, privacy);
+
+            if (set) LocaleManager.getInstance().sendMessage(CobaltServer.getInstance(), player, "commands.warp.privacy.set", placeholders);
+            else LocaleManager.getInstance().sendMessage(CobaltServer.getInstance(), player, "commands.warp.privacy.could_not_set", placeholders);
+        } else {
+            LocaleManager.getInstance().sendMessage(CobaltServer.getInstance(), player, "commands.warp.error.warp_not_found", placeholders);
+        }
     }
 
     /**
@@ -62,22 +93,18 @@ public class WarpCommand {
         UUID pID = player.getUniqueId();
 
         String name = (String)args[0];
-        List<Warp> warps = DatabaseHook.getWarpsByName(name);
-
-        if (warps == null) return;
+        Warp warp = WarpManager.getWarp(player, name);
 
         StringPlaceholders namePlaceholder = StringPlaceholders.builder()
                 .addPlaceholder("name", name).build();
 
-        if (warps.size() == 0){
+        if (warp == null){
             localeManager.sendMessage(CobaltServer.getInstance(), player, "commands.warp.error.warp_not_found", namePlaceholder);
             return;
         }
 
-        Warp highestPriorityWarp = warps.get(0);
-
         localeManager.sendMessage(CobaltServer.getInstance(), player, "commands.warp.teleport.success", namePlaceholder);
-        player.teleport(highestPriorityWarp.getLocation());
+        player.teleport(warp.getLocation());
     }
 
     /**
@@ -88,7 +115,7 @@ public class WarpCommand {
      */
     private static void warpCreate(Player player, Object[] args){
         LocaleManager localeManager = LocaleManager.getInstance();
-        List<Warp> currentWarps = DatabaseHook.getWarps();
+        Warp[] currentWarps = WarpManager.getAllWarps();
 
         String name = (String)args[0];
         StringPlaceholders namePlaceholder = StringPlaceholders.builder()
@@ -100,17 +127,17 @@ public class WarpCommand {
             return;
         }
 
-        // Check if warp with the same name already exists
+        // Check if warp with the same name by the same creator already exists
         for (Warp warp : currentWarps){
-            if (warp.getName().equalsIgnoreCase(name)){
+            if (warp.getName().equalsIgnoreCase(name) && warp.getOwner() == player.getUniqueId()){
                 localeManager.sendMessage(CobaltServer.getInstance(), player, "commands.warp.create.error.name_already_exists", namePlaceholder);
                 return;
             }
         }
 
         // Create the warp and store it in the database
-        Warp warp = new Warp(name, player.getUniqueId(), player.getLocation());
-        DatabaseHook.insertWarp(warp);
+        Warp warp = new Warp(name, player.getUniqueId(), player.getName(), player.getLocation());
+        WarpManager.insertWarp(warp);
 
         localeManager.sendMessage(CobaltServer.getInstance(), player, "commands.warp.create.info.created_warp", namePlaceholder);
     }
@@ -126,60 +153,42 @@ public class WarpCommand {
         UUID pID = player.getUniqueId();
 
         String name = (String)args[0];
-        List<Warp> warps = DatabaseHook.getWarpsByName(name);
-
-        if (warps == null) return;
+        Warp warp = WarpManager.getWarp(player, name);
 
         StringPlaceholders namePlaceholder = StringPlaceholders.builder()
                 .addPlaceholder("name", name).build();
 
-        if (warps.size() == 0){
+        if (warp == null){
             localeManager.sendMessage(CobaltServer.getInstance(), player, "commands.warp.error.warp_not_found", namePlaceholder);
             return;
         }
 
-        Warp highestPriorityWarp = warps.get(0);
-        if (warps.size() == 1 || highestPriorityWarp.getOwner().equals(pID)){
-            localeManager.sendMessage(CobaltServer.getInstance(), player, "commands.warp.info.header", namePlaceholder);
+        // Send warp info
+        localeManager.sendMessage(CobaltServer.getInstance(), player, "commands.warp.info.header", namePlaceholder);
 
-            Location loc = highestPriorityWarp.getLocation();
+        Location loc = warp.getLocation();
 
-            // Send publicly available details
-            StringPlaceholders pOwner = StringPlaceholders.builder()
-                    .addPlaceholder("owner", Bukkit.getPlayer(highestPriorityWarp.getOwner()).getDisplayName())
-                    .build();
-            localeManager.sendMessage("", player, "commands.warp.info.detail.owner", pOwner);
-            StringPlaceholders pWorld = StringPlaceholders.builder()
-                    .addPlaceholder("world", loc.getWorld().getName())
-                    .build();
-            localeManager.sendMessage("", player, "commands.warp.info.detail.world", pWorld);
-            StringPlaceholders pLocation = StringPlaceholders.builder()
-                    .addPlaceholder("location", highestPriorityWarp.getLocation())
-                    .build();
-            localeManager.sendMessage("", player, "commands.warp.info.detail.location", pLocation);
-            StringPlaceholders pDistance = StringPlaceholders.builder()
-                    .addPlaceholder("distance", (double)Math.round(player.getLocation().distance(loc)*100)/100)
-                    .build();
-            localeManager.sendMessage("", player, "commands.warp.info.detail.distance", pDistance);
-            StringPlaceholders pPrivacy = StringPlaceholders.builder()
-                    .addPlaceholder("privacy", highestPriorityWarp.getPrivacyLevel().name())
-                    .build();
-            localeManager.sendMessage("", player, "commands.warp.info.detail.privacy", pPrivacy);
-        }
-    }
-
-    /**
-     * Returns all warp names
-     *
-     * @return a list of warp names
-     */
-    private static String[] getWarpNames(){
-        List<Warp> warps = DatabaseHook.getWarps();
-        String[] warpNames = new String[warps.size()];
-        for (int i = 0; i < warps.size(); i++){
-            warpNames[i] = warps.get(i).getName();
-        }
-        return warpNames;
+        // Send publicly available details
+        StringPlaceholders pOwner = StringPlaceholders.builder()
+                .addPlaceholder("owner", warp.getOwnerName())
+                .build();
+        localeManager.sendMessage("", player, "commands.warp.info.detail.owner", pOwner);
+        StringPlaceholders pWorld = StringPlaceholders.builder()
+                .addPlaceholder("world", loc.getWorld().getName())
+                .build();
+        localeManager.sendMessage("", player, "commands.warp.info.detail.world", pWorld);
+        StringPlaceholders pLocation = StringPlaceholders.builder()
+                .addPlaceholder("location", warp.getLocation())
+                .build();
+        localeManager.sendMessage("", player, "commands.warp.info.detail.location", pLocation);
+        StringPlaceholders pDistance = StringPlaceholders.builder()
+                .addPlaceholder("distance", (double)Math.round(player.getLocation().distance(loc)*100)/100)
+                .build();
+        localeManager.sendMessage("", player, "commands.warp.info.detail.distance", pDistance);
+        StringPlaceholders pPrivacy = StringPlaceholders.builder()
+                .addPlaceholder("privacy", warp.getPrivacyLevel().name())
+                .build();
+        localeManager.sendMessage("", player, "commands.warp.info.detail.privacy", pPrivacy);
     }
 
     /**
@@ -192,7 +201,7 @@ public class WarpCommand {
         LocaleManager localeManager = LocaleManager.getInstance();
 
         String name = (String)args[0];
-        int deletedWarps = DatabaseHook.deleteWarp(name);
+        int deletedWarps = WarpManager.removeWarp(player, name);
         StringPlaceholders namePlaceholder = StringPlaceholders.builder()
                 .addPlaceholder("name", name)
                 .addPlaceholder("count", deletedWarps)
@@ -214,11 +223,10 @@ public class WarpCommand {
     private static void warpList(Player player, Object[] args){
         LocaleManager localeManager = LocaleManager.getInstance();
 
-        List<Warp> warps = DatabaseHook.getWarps();
-        if (warps == null) return;
+        Warp[] warps = WarpManager.getWarps(player);
 
         localeManager.sendMessage(CobaltServer.getInstance(), player, "commands.warp.list.header");
-        for (Warp w : warps){
+        for (Warp w : warps) {
             StringPlaceholders placeholders = StringPlaceholders.builder()
                     .addPlaceholder("name", w.getName())
                     .addPlaceholder("location", w.getLocation())
