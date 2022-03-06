@@ -2,14 +2,18 @@ package se.fusion1013.plugin.cobaltserver.settings;
 
 import se.fusion1013.plugin.cobaltcore.CobaltCore;
 import se.fusion1013.plugin.cobaltcore.manager.Manager;
-import se.fusion1013.plugin.cobaltcore.settings.Setting;
+import se.fusion1013.plugin.cobaltcore.settings.BooleanSetting;
 import se.fusion1013.plugin.cobaltcore.settings.SettingsManager;
+import se.fusion1013.plugin.cobaltserver.CobaltServer;
 
 public class ServerSettingsManager extends Manager {
 
     // ----- REGISTERED SETTINGS -----
 
-    public static final Setting JOIN_VANISHED = SettingsManager.register()
+    public static final BooleanSetting JOIN_VANISHED = SettingsManager.register(new BooleanSetting(CobaltServer.getInstance(), "join_vanished",
+            "Whether the player will join in a vanished state or not.", "server.setting.join_vanished", false, false));
+    public static final BooleanSetting FAKE_VANISH_MESSAGES = SettingsManager.register(new BooleanSetting(CobaltServer.getInstance(), "fake_vanish_messages",
+            "Whether the player will send fake join/quit messages when vanishing/unvanishing.", "server.setting.fake_vanish_messages", false, false));
 
     // ----- CONSTRUCTORS -----
 
