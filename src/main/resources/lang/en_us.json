@@ -14,7 +14,6 @@
   "commands.near.result": "&3%player_count% &7players in the range of &3%range% &7blocks: %players%",
   "commands.near.fail": "&7No players were found in the range of &3%range% &7blocks",
 
-
   "commands.warp.error.warp_not_found": "&7Warp &3%name% &7not found",
   "commands.warp.create.error.invalid_name": "&7Invalid Name: &3%name%",
   "commands.warp.create.error.name_already_exists": "&7Name Already Exists: &3%name%",
@@ -28,7 +27,10 @@
   "commands.warp.info.detail.privacy": "&3- &7Privacy: &3%privacy%",
 
   "commands.warp.list.header": "&7Displaying All Available Warps:",
-  "commands.warp.list.entry": "&3- &3%name% &7- %location% in &3%world%",
+  "commands.warp.list.entry": "&3- &3%name%&7: %location% in &3%world%",
+
+  "commands.warp.privacy.set": "&7Set privacy for warp &3%name% &7to &3%privacy%",
+  "commands.warp.privacy.could_not_set": "&7Could not set the privacy for warp &3%name% &7to &3%privacy%",
 
   "commands.warp.teleport.success": "&7Teleported to &3%name%",
 
@@ -36,10 +38,9 @@
 
 
   "commands.gamemode.change": "&7Set &3%player_name%&7's gamemode to &3%gamemode%",
-  "commands.gamemode.error.gamemode_not_found": "&7Gamemode &3%gamemode% &7not found",
+  "commands.gamemode.error.gamemode_not_found": "&7Gamemode &3%gamemode_raw% &7not found",
 
   "commands.tag.stats": "&7Player &3%player% &7has been tagged &3%count% &7times",
-
 
   "commands.broadcast.prefix": "&7[<g:#00aaaa:#0066aa>Broadcast&7] ",
 
@@ -51,6 +52,17 @@
   "commands.colors.color_codes_description": "&7Usage: <#HEXCODE>, #HEXCODE, &&7FORMAT_CODE, followed by the message",
   "commands.colors.color_codes": "&7Color Codes: &0&&00 &1&&11 &2&&22 &3&&33 &4&&44 &5&&55 &6&&66 &7&&77 &8&&88 &9&&99 &a&&aa &b&&bb &c&&cc &d&&dd &e&&ee &f&&ff",
   "commands.colors.formatting_codes": "&7Formatting Codes: &&ll&r&7 &&mm&r&7 &&nn&r&7 &&oo&r&7 &&rr",
+
+  "commands.teleport.entity_to_location": "&7Teleported &3%entity% &7to %location%",
+  "commands.teleport.entities_to_location": "&7Teleported &3%entity_count% &7entities to %location%",
+
+  "commands.nickname.changed": "&7Changed nickname for player &3%player% &7to &3%to_name%",
+  "commands.nickname.reset": "&7Reset nickname for &3%player%",
+
+  "commands.message.receiver": "&3&o%sender% &7&owhispers to you: %message%",
+  "commands.message.sender": "&7&oYou whisper to &3&o%receiver%&7&o: %message%",
+
+  "commands.error.player_does_not_exist": "&cThat player does not exist",
 
   "games.tag.message": "&7Player &3%target% &7has been tagged by &3%tagger%",
   "games.tag.loserboard": "&7- [&3%id%&7] &3%player%&7: &3%count%",
