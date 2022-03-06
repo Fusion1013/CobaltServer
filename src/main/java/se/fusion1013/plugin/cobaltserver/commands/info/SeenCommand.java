@@ -1,9 +1,8 @@
-package se.fusion1013.plugin.cobaltserver.commands;
+package se.fusion1013.plugin.cobaltserver.commands.info;
 
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.arguments.StringArgument;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import se.fusion1013.plugin.cobaltcore.manager.LocaleManager;
 import se.fusion1013.plugin.cobaltcore.util.PlayerUtil;
@@ -12,7 +11,6 @@ import se.fusion1013.plugin.cobaltcore.util.TimeUtil;
 import se.fusion1013.plugin.cobaltserver.CobaltServer;
 import se.fusion1013.plugin.cobaltserver.database.DatabaseHook;
 
-import java.time.Duration;
 import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
