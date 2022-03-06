@@ -1,4 +1,4 @@
-package se.fusion1013.plugin.cobaltserver.commands;
+package se.fusion1013.plugin.cobaltserver.commands.info;
 
 import dev.jorel.commandapi.CommandAPICommand;
 import se.fusion1013.plugin.cobaltcore.manager.LocaleManager;
