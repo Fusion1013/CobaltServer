@@ -1,4 +1,4 @@
-package se.fusion1013.plugin.cobaltserver.commands;
+package se.fusion1013.plugin.cobaltserver.commands.self;
 
 import dev.jorel.commandapi.CommandAPICommand;
 import org.bukkit.Material;
