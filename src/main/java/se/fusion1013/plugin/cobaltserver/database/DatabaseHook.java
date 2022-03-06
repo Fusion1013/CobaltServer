@@ -32,9 +32,10 @@ public class DatabaseHook {
             "`id` INTEGER NOT NULL," +
             "`name` varchar(32) NOT NULL," +
             "`owner_uuid` varchar(36) NOT NULL," +
+            "`owner_name` varchar(32) NOT NULL," +
             "`location_uuid` varchar(36) NOT NULL," +
             "`privacy` varchar(32) NOT NULL," +
-            "PRIMARY KEY (`name`)," +
+            "PRIMARY KEY (`name`, `owner_uuid`)," +
             "FOREIGN KEY(location_uuid) REFERENCES locations(uuid) ON DELETE CASCADE," +
             "CHECK (privacy in ('public','private'))" +
             ");";
@@ -73,7 +74,7 @@ public class DatabaseHook {
     // ----- VIEWS -----
 
     public static String SQLiteCreateWarpInformationView = "CREATE VIEW IF NOT EXISTS warp_information AS" +
-            " SELECT warps.name, warps.owner_uuid, warps.location_uuid, warps.privacy, locations.world, locations.x_pos, locations.y_pos, locations.z_pos, locations.yaw, locations.pitch" +
+            " SELECT warps.name, warps.owner_uuid, warps.owner_name, warps.location_uuid, warps.privacy, locations.world, locations.x_pos, locations.y_pos, locations.z_pos, locations.yaw, locations.pitch" +
             " FROM warps" +
             " INNER JOIN locations ON locations.uuid = warps.location_uuid;";
 
@@ -351,13 +352,15 @@ public class DatabaseHook {
     /**
      * Deletes the warps with the given name
      * @param name the name of the warp(s)
+     * @param playerUUID the uuid of the player that is deleting the warp.
      * @return the number of deleted warps
      */
-    public static int deleteWarp(String name) {
+    public static int deleteWarp(String name, UUID playerUUID) {
         try {
             Connection conn = database.getSQLConnection();
-            PreparedStatement st = conn.prepareStatement("DELETE FROM warps WHERE name = ?");
+            PreparedStatement st = conn.prepareStatement("DELETE FROM warps WHERE name = ? AND owner_uuid = ?");
             st.setString(1, name);
+            st.setString(2, playerUUID.toString());
             int deletedWarps = st.executeUpdate();
             st.close();
             return deletedWarps;
@@ -368,19 +371,58 @@ public class DatabaseHook {
     }
 
     /**
-     * Returns a list of all warps
+     * Saves a map of warps to the database.
+     *
+     * @param warps warp to save.
+     */
+    public static void saveWarps(Map<String, Warp> warps) {
+        try {
+            Connection conn = database.getSQLConnection();
+            PreparedStatement ps = conn.prepareStatement("INSERT OR REPLACE INTO warps(id, name, owner_uuid, owner_name, location_uuid, privacy) VALUES(?,?,?,?,?, ?)");
+            conn.setAutoCommit(false);
+
+            for (Warp warp : warps.values()) {
+                int id = warp.getId();
+                String name = warp.getName();
+                UUID owner = warp.getOwner();
+                Location location = warp.getLocation();
+                String privacyLevel = warp.getPrivacyLevel().name().toLowerCase();
+
+                UUID locationUUID = UUID.randomUUID();
+                SQLite.insertLocation(locationUUID, location);
+
+                ps.setInt(1, id);
+                ps.setString(2, name);
+                ps.setString(3, owner.toString());
+                ps.setString(4, warp.getOwnerName());
+                ps.setString(5, locationUUID.toString());
+                ps.setString(6, privacyLevel);
+
+                ps.executeUpdate();
+            }
+            conn.commit();
+            conn.setAutoCommit(true);
+            conn.close();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    /**
+     * Returns a map of all warps
      * @return a list of all warps
      */
-    public static List<Warp> getWarps(){
+    public static Map<String, Warp> getWarps(){
         try {
             Connection conn = database.getSQLConnection();
             PreparedStatement stmt = conn.prepareStatement("SELECT * FROM warp_information");
             ResultSet rs = stmt.executeQuery();
-            List<Warp> warps = new ArrayList<>();
+            Map<String, Warp> warps = new HashMap<>();
 
             while (rs.next()){
                 String name = rs.getString("name");
                 UUID uuid = UUID.fromString(rs.getString("owner_uuid"));
+                String ownerName = rs.getString("owner_name");
                 World world = Bukkit.getWorld(rs.getString("world"));
                 double x = rs.getDouble("x_pos");
                 double y = rs.getDouble("y_pos");
@@ -391,10 +433,10 @@ public class DatabaseHook {
 
                 String privacy = rs.getString("privacy");
 
-                Warp warp = new Warp(name, uuid, new Location(world, x, y, z, (float)yaw, (float)pitch));
+                Warp warp = new Warp(name, uuid, ownerName, new Location(world, x, y, z, (float)yaw, (float)pitch));
                 warp.setPrivacyLevel(privacy);
 
-                warps.add(warp);
+                warps.put(warp.getExpandedName(), warp);
             }
 
             stmt.close();
@@ -406,78 +448,5 @@ public class DatabaseHook {
         }
 
         return null;
-    }
-
-    /**
-     * Returns a list of warps with the given name
-     * @param name name of the warps to find
-     * @return a list of warps
-     */
-    public static List<Warp> getWarpsByName(String name){
-        try {
-            Connection conn = database.getSQLConnection();
-            PreparedStatement stmt = conn.prepareStatement("SELECT * FROM warp_information WHERE name = ?");
-            stmt.setString(1, name);
-            ResultSet rs = stmt.executeQuery();
-
-            List<Warp> warps = new ArrayList<>();
-
-            while (rs.next()){
-                UUID uuid = UUID.fromString(rs.getString("owner_uuid"));
-                World world = Bukkit.getWorld(rs.getString("world"));
-                double x = rs.getDouble("x_pos");
-                double y = rs.getDouble("y_pos");
-                double z = rs.getDouble("z_pos");
-                float yaw = (float)rs.getDouble("yaw");
-                float pitch = (float)rs.getDouble("pitch");
-                String privacy = rs.getString("privacy");
-
-                Warp warp = new Warp(name, uuid, new Location(world, x, y, z, yaw, pitch));
-                warp.setPrivacyLevel(privacy);
-
-                warps.add(warp);
-            }
-            stmt.close();
-
-            return warps;
-        } catch (SQLException e){
-            CobaltServer.getInstance().getLogger().log(Level.SEVERE, "SQLException while retrieving data from database", e);
-        }
-        return null;
-    }
-
-    /**
-     * Insert a warp into the database
-     * @param warp the warp to insert
-     */
-    public static void insertWarp(Warp warp){
-        int id = warp.getId();
-        String name = warp.getName();
-        UUID owner = warp.getOwner();
-        Location location = warp.getLocation();
-        String privacyLevel = warp.getPrivacyLevel().name().toLowerCase();
-
-        UUID locationUUID = UUID.randomUUID();
-        SQLite.insertLocation(locationUUID, location);
-
-        int rowsInserted = 0;
-
-        try {
-            PreparedStatement ps = database.getSQLConnection().prepareStatement("INSERT INTO warps(id, name, owner_uuid, location_uuid, privacy) VALUES(?,?,?,?,?)");
-
-            ps.setInt(1, id);
-            ps.setString(2, name);
-            ps.setString(3, owner.toString());
-            ps.setString(4, locationUUID.toString());
-            ps.setString(5, privacyLevel);
-
-            rowsInserted = ps.executeUpdate();
-            ps.close();
-
-        } catch (SQLException e){
-            CobaltServer.getInstance().getLogger().log(Level.FINE, "SQLException when inserting into database: ", e);
-        }
-
-        CobaltServer.getInstance().getLogger().info("Inserted new warp '" + name + "' into database. " + rowsInserted + " rows inserted");
     }
 }
