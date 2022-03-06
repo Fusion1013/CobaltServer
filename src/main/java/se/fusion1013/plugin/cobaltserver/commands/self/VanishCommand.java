@@ -1,4 +1,4 @@
-package se.fusion1013.plugin.cobaltserver.commands;
+package se.fusion1013.plugin.cobaltserver.commands.self;
 
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
@@ -9,6 +9,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import se.fusion1013.plugin.cobaltcore.util.PlayerUtil;
+import se.fusion1013.plugin.cobaltserver.CobaltServer;
+import se.fusion1013.plugin.cobaltserver.settings.ServerSettingsManager;
 
 public class VanishCommand implements CommandExecutor {
 
@@ -39,15 +41,13 @@ public class VanishCommand implements CommandExecutor {
     // ----- VANISH EXECUTOR -----
 
     private static void executeToggleVanishCommand(Player player) {
-        // TODO: Silent, fake messages
-
         // Set vanished state
         boolean newVanishedState = !PlayerUtil.isVanished(player); // True if the new state is vanished state
         PlayerUtil.setVanished(player, newVanishedState, false);
 
         // Join / Quit Message
-        if (newVanishedState) PlayerUtil.sendQuitMessage(player);
-        else PlayerUtil.sendJoinMessage(player);
+        if (newVanishedState && ServerSettingsManager.FAKE_VANISH_MESSAGES.getValue(player)) PlayerUtil.sendQuitMessage(CobaltServer.getInstance(), player);
+        else if (ServerSettingsManager.FAKE_VANISH_MESSAGES.getValue(player)) PlayerUtil.sendJoinMessage(CobaltServer.getInstance(), player);
     }
 
 
