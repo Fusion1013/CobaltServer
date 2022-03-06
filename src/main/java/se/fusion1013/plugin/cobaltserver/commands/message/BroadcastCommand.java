@@ -1,4 +1,4 @@
-package se.fusion1013.plugin.cobaltserver.commands;
+package se.fusion1013.plugin.cobaltserver.commands.message;
 
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.arguments.GreedyStringArgument;
