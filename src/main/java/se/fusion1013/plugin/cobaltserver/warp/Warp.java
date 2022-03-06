@@ -1,28 +1,57 @@
 package se.fusion1013.plugin.cobaltserver.warp;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.entity.Player;
 
 import java.util.UUID;
 
 public class Warp {
 
+    // ----- VARIABLES -----
+
     private final int id;
     private final String name;
     private final UUID owner;
+    private final String ownerName;
     private final Location location;
     private PrivacyLevel privacyLevel;
 
-    public Warp(String name, UUID owner, Location location){
+    private final String expandedName;
+
+    // ----- CONSTRUCTORS -----
+
+    public Warp(String name, UUID owner, String ownerName, Location location){
         this.id = hashCode();
         this.name = name;
         this.owner = owner;
+        this.ownerName = ownerName;
         this.location = location;
         this.privacyLevel = PrivacyLevel.PUBLIC;
+        this.expandedName = ownerName + ":" + name;
     }
 
-    public void setPrivacyLevel(String privacyLevel){
-        if (privacyLevel.equalsIgnoreCase("private")) this.privacyLevel = PrivacyLevel.PRIVATE;
-        else if (privacyLevel.equalsIgnoreCase("public")) this.privacyLevel = PrivacyLevel.PUBLIC;
+    // ----- GETTERS / SETTERS -----
+
+    public String getOwnerName() {
+        return ownerName;
+    }
+
+    public boolean setPrivacyLevel(String privacyLevel){
+        if (privacyLevel.equalsIgnoreCase("private")) {
+            this.privacyLevel = PrivacyLevel.PRIVATE;
+            return true;
+        }
+        else if (privacyLevel.equalsIgnoreCase("public")) {
+            this.privacyLevel = PrivacyLevel.PUBLIC;
+            return true;
+        }
+
+        return false;
+    }
+
+    public String getExpandedName() {
+        return expandedName;
     }
 
     public int getId() {
@@ -57,5 +86,18 @@ public class Warp {
 
     public enum PrivacyLevel{
         PRIVATE, PUBLIC
+    }
+
+    // ----- UTIL -----
+
+    /**
+     * Constructs the expanded name for the warp. (PlayerName:WarpName)
+     *
+     * @param player the owner of the warp.
+     * @param warpName the name of the warp.
+     * @return the expanded name of the warp.
+     */
+    public static String constructExpandedName(Player player, String warpName) {
+        return player.getName() + ":" + warpName;
     }
 }
