@@ -1,16 +1,17 @@
 package se.fusion1013.plugin.cobaltserver.manager;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerAdvancementDoneEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.permissions.PermissionAttachment;
 import se.fusion1013.plugin.cobaltcore.CobaltCore;
 import se.fusion1013.plugin.cobaltcore.manager.LocaleManager;
 import se.fusion1013.plugin.cobaltcore.manager.Manager;
@@ -19,7 +20,6 @@ import se.fusion1013.plugin.cobaltcore.util.PlayerUtil;
 import se.fusion1013.plugin.cobaltcore.util.StringPlaceholders;
 import se.fusion1013.plugin.cobaltserver.CobaltServer;
 import se.fusion1013.plugin.cobaltserver.database.DatabaseHook;
-import se.fusion1013.plugin.cobaltserver.settings.ServerSettings;
 import se.fusion1013.plugin.cobaltserver.settings.ServerSettingsManager;
 
 import java.util.HashMap;
@@ -71,7 +71,7 @@ public class ChatManager extends Manager implements Listener {
         } else {
             // Send Message to all recipients
             for (Player p : event.getRecipients()) {
-                p.sendMessage("<" + playerName + "> " + message);
+                p.sendMessage(HexUtils.colorify("<" + playerName + "&r> ") + message);
             }
 
             // Send message to discord channels
@@ -79,41 +79,49 @@ public class ChatManager extends Manager implements Listener {
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onPlayerJoin(PlayerJoinEvent event) {
 
         // Set vanished state
         Player player = event.getPlayer();
-        if (player.hasPermission("cobalt.commands.server.vanish") && PlayerUtil.isVanishInstalled()) { // TODO: Check setting if player should join vanished & send join message
+        if (player.hasPermission("cobalt.commands.server.vanish") && PlayerUtil.isVanishInstalled() && ServerSettingsManager.JOIN_VANISHED.getValue(player)) { // TODO: Check setting if player should join vanished & send join message
             PlayerUtil.setVanished(player, true, true);
-        } else {
-            PlayerUtil.sendJoinMessage(player);
-        }
+            player.sendMessage(ChatColor.DARK_AQUA + "You have joined vanished and silently");
 
-        // CobaltCore.getInstance().getLogger().info("Value: " + ServerSettingsManager.JOIN_VANISHED.getValue(player));
+            for (Player p : Bukkit.getOnlinePlayers()) {
+                if (!p.equals(player) && p.hasPermission("cobalt.commands.server.vanish")) p.sendMessage(ChatColor.DARK_AQUA + player.getName() + " has joined vanished");
+            }
+        } else {
+            // Send join messages
+            PlayerUtil.sendJoinMessage(CobaltServer.getInstance(), player);
+            DiscordManager.getInstance().sendMessage("```diff\n+ " + player.getName() + " joined the game" + "\n```", DiscordManager.ChannelOption.JOIN);
+            DiscordManager.sendPlayerList(null);
+        }
 
         // TODO: Permissions
 
-        // Discord Hook
-        DiscordManager.getInstance().sendMessage("```diff\n+ " + player.getName() + " joined the game" + "\n```", DiscordManager.ChannelOption.JOIN);
-        DiscordManager.sendPlayerList(null);
-
         // Set Nickname
-        player.setDisplayName(playerNicknames.get(player.getUniqueId()));
-        player.setPlayerListName(playerNicknames.get(player.getUniqueId()));
+        String nickname = playerNicknames.get(player.getUniqueId());
+        if (nickname != null) {
+            if (!nickname.equals("")) {
+                player.setDisplayName(HexUtils.colorify(nickname));
+                player.setPlayerListName(HexUtils.colorify(nickname));
+            }
+        }
 
         event.setJoinMessage("");
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onPlayerQuit(PlayerQuitEvent event) {
-        // Send quit message if player is not vanished // TODO: Check settings if quit message should be sent if player is vanished
-        if (!PlayerUtil.isVanished(event.getPlayer())) PlayerUtil.sendQuitMessage(event.getPlayer());
-
-        DiscordManager.getInstance().sendMessage("```diff\n- " + event.getPlayer().getName() + " left the game" + "\n```", DiscordManager.ChannelOption.LEAVE);
-        DiscordManager.sendPlayerList(event.getPlayer());
-
         event.setQuitMessage("");
+
+        // Send quit message if player is not vanished // TODO: Check settings if quit message should be sent if player is vanished
+        if (!PlayerUtil.isVanished(event.getPlayer())) {
+            PlayerUtil.sendQuitMessage(CobaltServer.getInstance(), event.getPlayer());
+            DiscordManager.getInstance().sendMessage("```diff\n- " + event.getPlayer().getName() + " left the game" + "\n```", DiscordManager.ChannelOption.LEAVE);
+            DiscordManager.sendPlayerList(event.getPlayer());
+        }
     }
 
     @EventHandler
@@ -157,9 +165,13 @@ public class ChatManager extends Manager implements Listener {
 
     public void setNickname(Player p, String nickname) {
         playerNicknames.put(p.getUniqueId(), nickname);
-        p.setDisplayName(nickname);
-        p.setPlayerListName(nickname);
-        p.setCustomName(nickname);
+
+        if (nickname != null) {
+            if (!nickname.equals("")) {
+                p.setDisplayName(HexUtils.colorify(nickname));
+                p.setPlayerListName(HexUtils.colorify(nickname));
+            }
+        }
     }
 
     // ----- INSTANCE VARIABLE & METHOD -----
