@@ -1,7 +1,7 @@
 package se.fusion1013.plugin.cobaltserver.manager;
 
 import se.fusion1013.plugin.cobaltcore.CobaltCore;
-import se.fusion1013.plugin.cobaltcore.manager.ConfigManager;
+import se.fusion1013.plugin.cobaltcore.config.ConfigManager;
 import se.fusion1013.plugin.cobaltcore.manager.Manager;
 import se.fusion1013.plugin.cobaltserver.CobaltServer;
 
@@ -22,7 +22,7 @@ public class ResourcePackManager extends Manager {
 
     @Override
     public void reload() {
-        this.resourcePackString = (String)ConfigManager.getInstance().getFromConfig(CobaltServer.getInstance(), "server.yml", "resource-pack-string");
+        this.resourcePackString = (String) ConfigManager.getInstance().getFromConfig(CobaltServer.getInstance(), "server.yml", "resource-pack-string");
     }
 
     @Override

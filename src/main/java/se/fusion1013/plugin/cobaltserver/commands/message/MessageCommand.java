@@ -2,13 +2,12 @@ package se.fusion1013.plugin.cobaltserver.commands.message;
 
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
+import dev.jorel.commandapi.arguments.ArgumentSuggestions;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.GreedyStringArgument;
-import dev.jorel.commandapi.arguments.PlayerArgument;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import se.fusion1013.plugin.cobaltcore.manager.LocaleManager;
+import se.fusion1013.plugin.cobaltcore.locale.LocaleManager;
 import se.fusion1013.plugin.cobaltcore.util.PlayerUtil;
 import se.fusion1013.plugin.cobaltcore.util.StringPlaceholders;
 
@@ -25,7 +24,7 @@ public class MessageCommand {
 
         new CommandAPICommand("msg")
                 .withAliases("tell", "w")
-                .withArguments(new EntitySelectorArgument("targets", EntitySelectorArgument.EntitySelector.MANY_ENTITIES).replaceSuggestions(PlayerUtil::getPlayerArguments))
+                .withArguments(new EntitySelectorArgument("targets", EntitySelectorArgument.EntitySelector.MANY_ENTITIES).replaceSuggestions(ArgumentSuggestions.strings(PlayerUtil::getPlayerArguments)))
                 .withArguments(new GreedyStringArgument("message"))
                 .executes(((sender, args) -> {
                     Collection<Entity> targets = (Collection<Entity>) args[0];

@@ -6,7 +6,7 @@
 
     <groupId>se.fusion1013.plugin</groupId>
     <artifactId>cobaltServer</artifactId>
-    <version>0.2.0</version>
+    <version>0.2.1</version>
     <packaging>jar</packaging>
 
     <name>CobaltServer</name>
@@ -77,7 +77,7 @@
         <dependency>
             <groupId>dev.jorel.CommandAPI</groupId>
             <artifactId>commandapi-core</artifactId>
-            <version>6.4.0</version>
+            <version>8.0.0</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -90,7 +90,7 @@
             <artifactId>cobaltCore</artifactId>
             <version>0.1</version>
             <scope>system</scope>
-            <systemPath>C:/Users/William/Documents/GitHub/CobaltCore/out/artifacts/CobaltCore_jar2/CobaltCore.jar</systemPath>
+            <systemPath>G:/Dokument/Minecraft/Minecraft Servers/1.18.1 - Paper DEV/plugins/CobaltCore-shaded.jar</systemPath>
         </dependency>
     </dependencies>
 </project>

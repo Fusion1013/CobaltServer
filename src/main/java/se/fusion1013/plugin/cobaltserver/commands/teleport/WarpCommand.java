@@ -1,12 +1,13 @@
 package se.fusion1013.plugin.cobaltserver.commands.teleport;
 
 import dev.jorel.commandapi.CommandAPICommand;
+import dev.jorel.commandapi.arguments.ArgumentSuggestions;
 import dev.jorel.commandapi.arguments.StringArgument;
 import dev.jorel.commandapi.arguments.TextArgument;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import se.fusion1013.plugin.cobaltcore.manager.LocaleManager;
+import se.fusion1013.plugin.cobaltcore.locale.LocaleManager;
 import se.fusion1013.plugin.cobaltcore.util.StringPlaceholders;
 import se.fusion1013.plugin.cobaltcore.util.StringUtil;
 import se.fusion1013.plugin.cobaltserver.CobaltServer;
@@ -24,12 +25,12 @@ public class WarpCommand {
 
         CommandAPICommand warpDeleteCommand = new CommandAPICommand("delete")
                 .withPermission("cobalt.server.command.warp.delete")
-                .withArguments(new TextArgument("warp name").replaceSuggestions(info -> WarpManager.getAllWarpNames()))
+                .withArguments(new TextArgument("warp name").replaceSuggestions(ArgumentSuggestions.strings(info -> WarpManager.getAllWarpNames())))
                 .executesPlayer(WarpCommand::warpDelete);
 
         CommandAPICommand warpInfoCommand = new CommandAPICommand("info")
                 .withPermission("cobalt.server.command.warp.info")
-                .withArguments(new StringArgument("warp name").replaceSuggestions(info -> WarpManager.getAllWarpNames()))
+                .withArguments(new StringArgument("warp name").replaceSuggestions(ArgumentSuggestions.strings(info -> WarpManager.getAllWarpNames())))
                 .executesPlayer(WarpCommand::warpInfo);
 
         CommandAPICommand warpCreateCommand = new CommandAPICommand("create")
@@ -39,8 +40,8 @@ public class WarpCommand {
 
         CommandAPICommand warpSetPrivacyCommand = new CommandAPICommand("privacy")
                 .withPermission("cobalt.server.command.warp.privacy")
-                .withArguments(new TextArgument("warp name").replaceSuggestions(info -> WarpManager.getAllWarpNames()))
-                .withArguments(new StringArgument("privacy").replaceSuggestions(info -> WarpManager.getPrivacyNames()))
+                .withArguments(new TextArgument("warp name").replaceSuggestions(ArgumentSuggestions.strings(info -> WarpManager.getAllWarpNames())))
+                .withArguments(new StringArgument("privacy").replaceSuggestions(ArgumentSuggestions.strings(info -> WarpManager.getPrivacyNames())))
                 .executesPlayer(WarpCommand::setPrivacy);
 
         // Register warp and setwarp commands
@@ -52,7 +53,7 @@ public class WarpCommand {
                 .withSubcommand(warpInfoCommand)
                 .withSubcommand(warpCreateCommand)
                 .withSubcommand(warpSetPrivacyCommand)
-                .withArguments(new TextArgument("warp name").replaceSuggestions(info -> WarpManager.getAllWarpNames()))
+                .withArguments(new TextArgument("warp name").replaceSuggestions(ArgumentSuggestions.strings(info -> WarpManager.getAllWarpNames())))
                 .executesPlayer(WarpCommand::warpTp)
                 .register();
 
@@ -136,7 +137,7 @@ public class WarpCommand {
         }
 
         // Create the warp and store it in the database
-        Warp warp = new Warp(name, player.getUniqueId(), player.getName(), player.getLocation());
+        Warp warp = new Warp(name, player.getUniqueId(), player.getName(), player.getLocation(), UUID.randomUUID());
         WarpManager.insertWarp(warp);
 
         localeManager.sendMessage(CobaltServer.getInstance(), player, "commands.warp.create.info.created_warp", namePlaceholder);

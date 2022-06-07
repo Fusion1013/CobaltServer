@@ -5,8 +5,11 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import se.fusion1013.plugin.cobaltcore.CobaltCore;
-import se.fusion1013.plugin.cobaltcore.database.Database;
-import se.fusion1013.plugin.cobaltcore.database.SQLite;
+import se.fusion1013.plugin.cobaltcore.database.location.ILocationDao;
+import se.fusion1013.plugin.cobaltcore.database.player.IPlayerDao;
+import se.fusion1013.plugin.cobaltcore.database.system.DataManager;
+import se.fusion1013.plugin.cobaltcore.database.system.Database;
+import se.fusion1013.plugin.cobaltcore.database.system.SQLite;
 import se.fusion1013.plugin.cobaltcore.util.PlayerUtil;
 import se.fusion1013.plugin.cobaltserver.CobaltServer;
 import se.fusion1013.plugin.cobaltserver.manager.DiscordManager;
@@ -24,7 +27,7 @@ public class DatabaseHook {
 
     // ----- VARIABLES -----
 
-    private static final Database database = CobaltCore.getInstance().getRDatabase();
+    private static final Database database = DataManager.getInstance().getSqliteDb();
 
     // ----- TABLES -----
 
@@ -86,7 +89,7 @@ public class DatabaseHook {
             " INNER JOIN locations ON locations.uuid = players.uuid;";
 
     public static void instantiateTables() {
-        database.executeString(SQLiteCreateWarpsTable);
+        // database.executeString(SQLiteCreateWarpsTable);
         database.executeString(SQLiteCreateDiscordChannelsTable);
         database.executeString(SQLiteCreatePlayerJoinTimesTable);
         database.executeString(SQLiteCreatePlayerLeaveTimesTable);
@@ -94,7 +97,7 @@ public class DatabaseHook {
         database.executeString(SQLiteCreateTagTable);
 
         database.executeString(SQLiteCreatePlayerTimesView);
-        database.executeString(SQLiteCreateWarpInformationView);
+        // database.executeString(SQLiteCreateWarpInformationView);
     }
 
     // ----- TAG GAME -----
@@ -311,53 +314,44 @@ public class DatabaseHook {
         return null;
     }
 
-    public static int insertLeavingPlayer(Player player) {
-        int insertedRows = SQLite.insertPlayer(player);
-        insertedRows += SQLite.insertLocation(player.getUniqueId(), player.getLocation());
+    public static void insertLeavingPlayer(Player player) {
+        DataManager.getInstance().getDao(IPlayerDao.class).insertPlayer(player);
+        DataManager.getInstance().getDao(ILocationDao.class).insertLocation(player.getUniqueId(), player.getLocation());
 
         try {
             Connection conn = database.getSQLConnection();
             PreparedStatement ps = conn.prepareStatement("INSERT OR REPLACE INTO player_leave_times(uuid, last_left) VALUES(?, datetime('now','localtime'))");
             ps.setString(1, player.getUniqueId().toString());
 
-            insertedRows += ps.executeUpdate();
+            ps.executeUpdate();
             ps.close();
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
-
-        return insertedRows;
     }
 
-    public static int insertJoiningPlayer(Player player) {
-        int insertedRows = SQLite.insertPlayer(player);
-        insertedRows += SQLite.insertLocation(player.getUniqueId(), player.getLocation());
+    public static void insertJoiningPlayer(Player player) {
+        DataManager.getInstance().getDao(IPlayerDao.class).insertPlayer(player);
+        DataManager.getInstance().getDao(ILocationDao.class).insertLocation(player.getUniqueId(), player.getLocation());
 
         try {
             Connection conn = database.getSQLConnection();
             PreparedStatement ps = conn.prepareStatement("INSERT OR REPLACE INTO player_join_times(uuid, last_joined) VALUES(?, datetime('now','localtime'))");
             ps.setString(1, player.getUniqueId().toString());
 
-            insertedRows += ps.executeUpdate();
+            ps.executeUpdate();
             ps.close();
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
-
-        return insertedRows;
     }
 
     // ----- WARPS -----
 
-    /**
-     * Deletes the warps with the given name
-     * @param name the name of the warp(s)
-     * @param playerUUID the uuid of the player that is deleting the warp.
-     * @return the number of deleted warps
-     */
+    /*
     public static int deleteWarp(String name, UUID playerUUID) {
         try {
-            Connection conn = database.getSQLConnection();
+            Connection conn = DataManager.getInstance().getSqliteDb().getSQLConnection();
             PreparedStatement st = conn.prepareStatement("DELETE FROM warps WHERE name = ? AND owner_uuid = ?");
             st.setString(1, name);
             st.setString(2, playerUUID.toString());
@@ -370,14 +364,9 @@ public class DatabaseHook {
         return 0;
     }
 
-    /**
-     * Saves a map of warps to the database.
-     *
-     * @param warps warp to save.
-     */
     public static void saveWarps(Map<String, Warp> warps) {
         try {
-            Connection conn = database.getSQLConnection();
+            Connection conn = DataManager.getInstance().getSqliteDb().getSQLConnection();
             PreparedStatement ps = conn.prepareStatement("INSERT OR REPLACE INTO warps(id, name, owner_uuid, owner_name, location_uuid, privacy) VALUES(?,?,?,?,?, ?)");
             conn.setAutoCommit(false);
 
@@ -389,7 +378,7 @@ public class DatabaseHook {
                 String privacyLevel = warp.getPrivacyLevel().name().toLowerCase();
 
                 UUID locationUUID = UUID.randomUUID();
-                SQLite.insertLocation(locationUUID, location);
+                DataManager.getInstance().getDao(ILocationDao.class).insertLocation(locationUUID, location);
 
                 ps.setInt(1, id);
                 ps.setString(2, name);
@@ -408,13 +397,9 @@ public class DatabaseHook {
         }
     }
 
-    /**
-     * Returns a map of all warps
-     * @return a list of all warps
-     */
     public static Map<String, Warp> getWarps(){
         try {
-            Connection conn = database.getSQLConnection();
+            Connection conn = DataManager.getInstance().getSqliteDb().getSQLConnection();
             PreparedStatement stmt = conn.prepareStatement("SELECT * FROM warp_information");
             ResultSet rs = stmt.executeQuery();
             Map<String, Warp> warps = new HashMap<>();
@@ -449,4 +434,5 @@ public class DatabaseHook {
 
         return null;
     }
+     */
 }

@@ -1,10 +1,11 @@
 package se.fusion1013.plugin.cobaltserver.commands.info;
 
 import dev.jorel.commandapi.CommandAPICommand;
+import dev.jorel.commandapi.arguments.ArgumentSuggestions;
 import dev.jorel.commandapi.arguments.StringArgument;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import se.fusion1013.plugin.cobaltcore.manager.LocaleManager;
+import se.fusion1013.plugin.cobaltcore.locale.LocaleManager;
 import se.fusion1013.plugin.cobaltcore.util.PlayerUtil;
 import se.fusion1013.plugin.cobaltcore.util.StringPlaceholders;
 import se.fusion1013.plugin.cobaltcore.util.TimeUtil;
@@ -22,7 +23,7 @@ public class SeenCommand {
     public static void register() {
         new CommandAPICommand("seen")
                 .withPermission("cobalt.server.commands.seen")
-                .withArguments(new StringArgument("player").replaceSuggestions(info -> PlayerUtil.getOnlinePlayerNames()))
+                .withArguments(new StringArgument("player").replaceSuggestions(ArgumentSuggestions.strings(info -> PlayerUtil.getOnlinePlayerNames())))
                 .executesPlayer(SeenCommand::executeSeenCommand)
                 .register();
     }

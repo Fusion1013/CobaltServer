@@ -5,7 +5,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
-import se.fusion1013.plugin.cobaltcore.manager.LocaleManager;
+import se.fusion1013.plugin.cobaltcore.locale.LocaleManager;
 import se.fusion1013.plugin.cobaltcore.util.StringPlaceholders;
 import se.fusion1013.plugin.cobaltserver.CobaltServer;
 
@@ -42,7 +42,7 @@ public class HatCommand {
         } else if (heldItem.getType().equals(helmet.getType()) && heldItem.getItemMeta().equals(helmet.getItemMeta())) {
             // Give a special message if the item they're holding is the same as their existing hat
             localeManager.sendMessage(CobaltServer.getInstance(), sender, "commands.hat.already_wearing", placeholders);
-        } else {
+        } else { // TODO: Check for curse of binding
             // Replace their hat with the currently held item
             // Create the new hat
             ItemStack newHat = heldItem.clone();

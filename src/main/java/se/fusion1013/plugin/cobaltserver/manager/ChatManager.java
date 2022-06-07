@@ -1,5 +1,6 @@
 package se.fusion1013.plugin.cobaltserver.manager;
 
+import net.dv8tion.jda.api.entities.Activity;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
@@ -13,7 +14,7 @@ import org.bukkit.event.player.PlayerAdvancementDoneEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import se.fusion1013.plugin.cobaltcore.CobaltCore;
-import se.fusion1013.plugin.cobaltcore.manager.LocaleManager;
+import se.fusion1013.plugin.cobaltcore.locale.LocaleManager;
 import se.fusion1013.plugin.cobaltcore.manager.Manager;
 import se.fusion1013.plugin.cobaltcore.util.HexUtils;
 import se.fusion1013.plugin.cobaltcore.util.PlayerUtil;
@@ -96,6 +97,9 @@ public class ChatManager extends Manager implements Listener {
             PlayerUtil.sendJoinMessage(CobaltServer.getInstance(), player);
             DiscordManager.getInstance().sendMessage("```diff\n+ " + player.getName() + " joined the game" + "\n```", DiscordManager.ChannelOption.JOIN);
             DiscordManager.sendPlayerList(null);
+
+            // Update discord bot status
+            DiscordManager.getInstance().updateBotStatus(Activity.watching(PlayerUtil.getUnvanishedPlayerCount() + " players online"));
         }
 
         // TODO: Permissions
@@ -121,6 +125,9 @@ public class ChatManager extends Manager implements Listener {
             PlayerUtil.sendQuitMessage(CobaltServer.getInstance(), event.getPlayer());
             DiscordManager.getInstance().sendMessage("```diff\n- " + event.getPlayer().getName() + " left the game" + "\n```", DiscordManager.ChannelOption.LEAVE);
             DiscordManager.sendPlayerList(event.getPlayer());
+
+            // Update discord bot status
+            DiscordManager.getInstance().updateBotStatus(Activity.watching(PlayerUtil.getUnvanishedPlayerCount() - 1 + " players online")); // Minus the player that is leaving
         }
     }
 

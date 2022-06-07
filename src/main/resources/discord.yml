@@ -3,4 +3,6 @@
 #
 # Discord bot token
 discord-token: ""
+# Discord bot prefix
+prefix: '!'
 #

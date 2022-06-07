@@ -11,8 +11,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import se.fusion1013.plugin.cobaltcore.CobaltCore;
-import se.fusion1013.plugin.cobaltcore.manager.ConfigManager;
-import se.fusion1013.plugin.cobaltcore.manager.LocaleManager;
+import se.fusion1013.plugin.cobaltcore.config.ConfigManager;
+import se.fusion1013.plugin.cobaltcore.locale.LocaleManager;
 import se.fusion1013.plugin.cobaltcore.manager.Manager;
 import se.fusion1013.plugin.cobaltcore.util.StringPlaceholders;
 import se.fusion1013.plugin.cobaltserver.CobaltServer;
@@ -28,7 +28,7 @@ public class DiscordManager extends Manager implements EventListener {
 
     // ----- VARIABLES -----
 
-    char prefix = '!';
+    String prefix = "!";
     JDA jda;
 
     private static List<DiscordCommand> registeredCommands = new ArrayList<>();
@@ -46,7 +46,7 @@ public class DiscordManager extends Manager implements EventListener {
     // ----- MESSAGE SENDING -----
 
     public void sendMessage(String message, ChannelOption option) {
-        sendMessageToChannels(message, channelOptionListMap.get(option));
+        if (channelOptionListMap.get(option) != null) sendMessageToChannels(message, channelOptionListMap.get(option));
     }
 
     private void sendMessageToChannels(String message, List<TextChannel> channels) {
@@ -67,6 +67,9 @@ public class DiscordManager extends Manager implements EventListener {
 
         CobaltServer.getInstance().getLogger().info("Instantiating bot...");
 
+        // Get bot prefix
+        prefix = (String) ConfigManager.getInstance().getFromConfig(CobaltServer.getInstance(), "discord.yml", "prefix");
+
         String token = (String)ConfigManager.getInstance().getFromConfig(CobaltServer.getInstance(), "discord.yml", "discord-token");
         if (token.equalsIgnoreCase("")) {
             CobaltServer.getInstance().getLogger().info("Token not found");
@@ -77,7 +80,7 @@ public class DiscordManager extends Manager implements EventListener {
             jda = JDABuilder.createDefault(token)
                     //.addEventListeners(new DiscordCommands())
                     .addEventListeners(this)
-                    .setActivity(Activity.playing("Prefix: " + prefix))
+                    .setActivity(Activity.watching(Bukkit.getOnlinePlayers().size() + " players online")) // Set activity
                     .build().awaitReady();
 
         } catch (LoginException | InterruptedException ex) {
@@ -124,7 +127,7 @@ public class DiscordManager extends Manager implements EventListener {
 
     private List<String> splitArguments(String message) {
         if (message.length() <= 0) return new ArrayList<>();
-        if (message.charAt(0) == prefix) message = message.substring(1);
+        if (message.startsWith(prefix)) message = message.substring(1);
         List<String> split = new ArrayList<>();
         Collections.addAll(split, message.split(" "));
         return split;
@@ -221,10 +224,14 @@ public class DiscordManager extends Manager implements EventListener {
     private boolean isCommand(Message msg) {
         String contentRaw = msg.getContentRaw();
         if (contentRaw.length() <= 0) return false;
-        else return contentRaw.charAt(0) == prefix;
+        else return contentRaw.startsWith(prefix);
     }
 
     // ----- GETTERS / SETTERS -----
+
+    public void updateBotStatus(Activity activity) {
+        if (jda != null) jda.getPresence().setActivity(activity);
+    }
 
     private String getCommand(MessageReceivedEvent event) {
         Message msg = event.getMessage();

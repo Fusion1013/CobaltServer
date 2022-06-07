@@ -1,7 +1,7 @@
 package se.fusion1013.plugin.cobaltserver.manager;
 
 import se.fusion1013.plugin.cobaltcore.CobaltCore;
-import se.fusion1013.plugin.cobaltcore.manager.ConfigManager;
+import se.fusion1013.plugin.cobaltcore.config.ConfigManager;
 import se.fusion1013.plugin.cobaltcore.manager.Manager;
 import se.fusion1013.plugin.cobaltserver.CobaltServer;
 

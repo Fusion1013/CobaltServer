@@ -1,7 +1,7 @@
 package se.fusion1013.plugin.cobaltserver.commands.info;
 
 import dev.jorel.commandapi.CommandAPICommand;
-import se.fusion1013.plugin.cobaltcore.manager.LocaleManager;
+import se.fusion1013.plugin.cobaltcore.locale.LocaleManager;
 import se.fusion1013.plugin.cobaltserver.CobaltServer;
 
 public class ColorCommand {

@@ -2,8 +2,10 @@ package se.fusion1013.plugin.cobaltserver.warp;
 
 import org.bukkit.entity.Player;
 import se.fusion1013.plugin.cobaltcore.CobaltCore;
+import se.fusion1013.plugin.cobaltcore.database.system.DataManager;
 import se.fusion1013.plugin.cobaltcore.manager.Manager;
 import se.fusion1013.plugin.cobaltserver.database.DatabaseHook;
+import se.fusion1013.plugin.cobaltserver.database.warp.IWarpDao;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -39,7 +41,8 @@ public class WarpManager extends Manager {
 
         if (warp != null) {
             warpCache.remove(warp.getExpandedName());
-            return DatabaseHook.deleteWarp(warp.getName(), warp.getOwner());
+            DataManager.getInstance().getDao(IWarpDao.class).deleteWarp(warp.getName(), warp.getOwner());
+            return 1;
         }
 
         return 0;
@@ -132,12 +135,12 @@ public class WarpManager extends Manager {
 
     @Override
     public void reload() {
-        warpCache = DatabaseHook.getWarps();
+        warpCache = DataManager.getInstance().getDao(IWarpDao.class).getWarps();
     }
 
     @Override
     public void disable() {
-        DatabaseHook.saveWarps(warpCache);
+        DataManager.getInstance().getDao(IWarpDao.class).saveWarps(warpCache);
     }
 
     // ----- INSTANCE VARIABLE & METHOD -----

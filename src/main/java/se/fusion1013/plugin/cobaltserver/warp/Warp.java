@@ -15,18 +15,20 @@ public class Warp {
     private final UUID owner;
     private final String ownerName;
     private final Location location;
+    private final UUID locationUUID;
     private PrivacyLevel privacyLevel;
 
     private final String expandedName;
 
     // ----- CONSTRUCTORS -----
 
-    public Warp(String name, UUID owner, String ownerName, Location location){
+    public Warp(String name, UUID owner, String ownerName, Location location, UUID locationUUID){
         this.id = hashCode();
         this.name = name;
         this.owner = owner;
         this.ownerName = ownerName;
         this.location = location;
+        this.locationUUID = locationUUID;
         this.privacyLevel = PrivacyLevel.PUBLIC;
         this.expandedName = ownerName + ":" + name;
     }
@@ -48,6 +50,10 @@ public class Warp {
         }
 
         return false;
+    }
+
+    public UUID getLocationUUID() {
+        return locationUUID;
     }
 
     public String getExpandedName() {

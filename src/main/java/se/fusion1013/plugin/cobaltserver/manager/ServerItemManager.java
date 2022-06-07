@@ -4,7 +4,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import se.fusion1013.plugin.cobaltcore.CobaltCore;
 import se.fusion1013.plugin.cobaltcore.item.CustomItem;
-import se.fusion1013.plugin.cobaltcore.manager.CustomItemManager;
+import se.fusion1013.plugin.cobaltcore.item.CustomItemManager;
 import se.fusion1013.plugin.cobaltcore.manager.Manager;
 
 public class ServerItemManager extends Manager {

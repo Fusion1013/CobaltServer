@@ -1,22 +1,29 @@
 package se.fusion1013.plugin.cobaltserver.discord.system;
 
+import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import se.fusion1013.plugin.cobaltserver.manager.DiscordManager;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 
 public class DiscordCommand {
 
     // ----- VARIABLES -----
 
-    private List<DiscordCommand> subCommands = new ArrayList<>();
-    private List<IDiscordArgument<?>> arguments = new ArrayList<>();
+    private final List<DiscordCommand> subCommands = new ArrayList<>();
+    private final List<IDiscordArgument<?>> arguments = new ArrayList<>();
 
-    private String commandName;
+    private final String commandName;
     private String helpMessage = "[Missing description]";
     private IExecutes executes;
+
+    // Permissions
+    private Permission permission = Permission.MESSAGE_SEND;
 
     // ----- CONSTRUCTORS -----
 
@@ -27,6 +34,20 @@ public class DiscordCommand {
     // ----- COMMAND EXECUTION -----
 
     public boolean executeCommand(User author, TextChannel channel, List<String> rest) {
+        // Check for permissions
+        List<Guild> userGuilds = author.getMutualGuilds();
+        boolean hasPermission = false;
+        for (Guild g : userGuilds) {
+            Member userMember = g.getMember(author);
+
+            if (userMember != null) {
+                if (userMember.hasPermission(channel, permission)) hasPermission = true;
+            }
+        }
+
+        // If the user does not have the required permission, return.
+        if (!hasPermission) return false;
+
         if (!executeSubcommand(author, channel, rest)) {
 
             if (rest.size() < arguments.size()) {
@@ -69,8 +90,8 @@ public class DiscordCommand {
         return this;
     }
 
-    public DiscordCommand withPermission(String permission) {
-        // TODO
+    public DiscordCommand withPermission(Permission permission) {
+        this.permission = permission;
         return this;
     }
 

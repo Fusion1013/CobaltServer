@@ -5,7 +5,7 @@ import dev.jorel.commandapi.arguments.GreedyStringArgument;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
-import se.fusion1013.plugin.cobaltcore.manager.LocaleManager;
+import se.fusion1013.plugin.cobaltcore.locale.LocaleManager;
 import se.fusion1013.plugin.cobaltcore.util.HexUtils;
 
 public class BroadcastCommand {

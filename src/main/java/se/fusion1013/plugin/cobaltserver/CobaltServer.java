@@ -4,7 +4,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import se.fusion1013.plugin.cobaltcore.CobaltCore;
 import se.fusion1013.plugin.cobaltcore.CobaltPlugin;
-import se.fusion1013.plugin.cobaltcore.manager.ConfigManager;
+import se.fusion1013.plugin.cobaltcore.config.ConfigManager;
 import se.fusion1013.plugin.cobaltcore.util.PlayerUtil;
 import se.fusion1013.plugin.cobaltserver.commands.*;
 import se.fusion1013.plugin.cobaltserver.commands.info.*;
@@ -17,6 +17,7 @@ import se.fusion1013.plugin.cobaltserver.commands.self.VanishCommand;
 import se.fusion1013.plugin.cobaltserver.commands.teleport.TeleportCommand;
 import se.fusion1013.plugin.cobaltserver.commands.teleport.WarpCommand;
 import se.fusion1013.plugin.cobaltserver.database.DatabaseHook;
+import se.fusion1013.plugin.cobaltserver.database.ServerDataManager;
 import se.fusion1013.plugin.cobaltserver.discord.commands.DiscordEchoCommand;
 import se.fusion1013.plugin.cobaltserver.discord.commands.DiscordPingCommand;
 import se.fusion1013.plugin.cobaltserver.discord.commands.DiscordSubscribeCommand;
@@ -51,21 +52,24 @@ public final class CobaltServer extends JavaPlugin implements CobaltPlugin {
     @Override
     public void onDisable() {
         // Plugin shutdown logic
-        CobaltCore.getInstance().onDisable();
+        // CobaltCore.getInstance().onDisable();
+        CobaltCore.getInstance().disableCobaltPlugin(this);
     }
 
     // ----- MANAGER -----
 
     @Override
     public void reloadManagers() {
-        CobaltCore.getInstance().getManager(ServerConfigManager.class);
-        CobaltCore.getInstance().getManager(ChatManager.class);
-        CobaltCore.getInstance().getManager(DiscordManager.class);
-        CobaltCore.getInstance().getManager(ServerItemManager.class);
-        CobaltCore.getInstance().getManager(GameManager.class);
-        CobaltCore.getInstance().getManager(ResourcePackManager.class);
-        CobaltCore.getInstance().getManager(ServerSettingsManager.class);
-        CobaltCore.getInstance().getManager(WarpManager.class);
+        CobaltCore.getInstance().getManager(this, ServerDataManager.class);
+
+        CobaltCore.getInstance().getManager(this, ServerConfigManager.class);
+        CobaltCore.getInstance().getManager(this, ChatManager.class);
+        CobaltCore.getInstance().getManager(this, DiscordManager.class);
+        CobaltCore.getInstance().getManager(this, ServerItemManager.class);
+        CobaltCore.getInstance().getManager(this, GameManager.class);
+        CobaltCore.getInstance().getManager(this, ResourcePackManager.class);
+        CobaltCore.getInstance().getManager(this, ServerSettingsManager.class);
+        CobaltCore.getInstance().getManager(this, WarpManager.class);
     }
 
     // ----- DATABASE -----

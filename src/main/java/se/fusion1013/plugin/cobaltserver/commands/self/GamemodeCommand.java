@@ -2,12 +2,14 @@ package se.fusion1013.plugin.cobaltserver.commands.self;
 
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
+import dev.jorel.commandapi.arguments.ArgumentSuggestions;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.PlayerArgument;
 import dev.jorel.commandapi.arguments.StringArgument;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
-import se.fusion1013.plugin.cobaltcore.manager.LocaleManager;
+import se.fusion1013.plugin.cobaltcore.locale.LocaleManager;
+import se.fusion1013.plugin.cobaltcore.util.PlayerUtil;
 import se.fusion1013.plugin.cobaltcore.util.StringPlaceholders;
 import se.fusion1013.plugin.cobaltserver.CobaltServer;
 
@@ -27,8 +29,8 @@ public class GamemodeCommand {
         return new CommandAPICommand("gamemode")
                 .withPermission("cobalt.server.commands.gamemode")
                 .withAliases("gm")
-                .withArguments(new StringArgument("gamemode").replaceSuggestions(info -> new String[]{"survival","creative","adventure","spectator"}))
-                .withArguments(new PlayerArgument("target"))
+                .withArguments(new StringArgument("gamemode").replaceSuggestions(ArgumentSuggestions.strings(info -> new String[]{"survival","creative","adventure","spectator"})))
+                .withArguments(new PlayerArgument("target").replaceSuggestions(ArgumentSuggestions.strings(PlayerUtil::getPlayerArguments)))
                 .executesPlayer(((sender, args) -> {
                     GameMode gameMode = getGamemode((String)args[0]);
 
@@ -54,18 +56,19 @@ public class GamemodeCommand {
         return new CommandAPICommand("gamemode")
                 .withPermission("cobalt.server.commands.gamemode")
                 .withAliases("gm")
-                .withArguments(new StringArgument("gamemode").replaceSuggestions(info -> new String[]{"survival","creative","adventure","spectator"}))
+                .withArguments(new StringArgument("gamemode").replaceSuggestions(ArgumentSuggestions.strings(info -> new String[]{"survival","creative","adventure","spectator"})))
                 .executesPlayer(((sender, args) -> {
                     GameMode gameMode = getGamemode((String)args[0]);
 
                     LocaleManager localeManager = LocaleManager.getInstance();
                     StringPlaceholders placeholders = StringPlaceholders.builder()
                             .addPlaceholder("player_name", sender.getName())
-                            .addPlaceholder("gamemode", args[0])
+                            .addPlaceholder("gamemode_raw", args[0])
                             .build();
 
                     if (gameMode != null) {
                         sender.setGameMode(gameMode);
+                        placeholders.addPlaceholder("gamemode", gameMode.name().toLowerCase());
                         localeManager.sendMessage(CobaltServer.getInstance(), sender, "commands.gamemode.change", placeholders);
                     } else {
                         localeManager.sendMessage(CobaltServer.getInstance(), sender, "commands.gamemode.error.gamemode_not_found", placeholders);

@@ -3,7 +3,7 @@ package se.fusion1013.plugin.cobaltserver.commands.info;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.arguments.DoubleArgument;
 import org.bukkit.entity.Player;
-import se.fusion1013.plugin.cobaltcore.manager.LocaleManager;
+import se.fusion1013.plugin.cobaltcore.locale.LocaleManager;
 import se.fusion1013.plugin.cobaltcore.util.PlayerUtil;
 import se.fusion1013.plugin.cobaltcore.util.StringPlaceholders;
 import se.fusion1013.plugin.cobaltserver.CobaltServer;

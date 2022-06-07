@@ -1,11 +1,15 @@
 package se.fusion1013.plugin.cobaltserver.commands;
 
 import dev.jorel.commandapi.CommandAPICommand;
+import dev.jorel.commandapi.arguments.ArgumentSuggestions;
 import dev.jorel.commandapi.arguments.PlayerArgument;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import se.fusion1013.plugin.cobaltcore.database.SQLite;
-import se.fusion1013.plugin.cobaltcore.manager.LocaleManager;
+import se.fusion1013.plugin.cobaltcore.database.player.IPlayerDao;
+import se.fusion1013.plugin.cobaltcore.database.system.DataManager;
+import se.fusion1013.plugin.cobaltcore.database.system.SQLite;
+import se.fusion1013.plugin.cobaltcore.locale.LocaleManager;
+import se.fusion1013.plugin.cobaltcore.util.PlayerUtil;
 import se.fusion1013.plugin.cobaltcore.util.StringPlaceholders;
 import se.fusion1013.plugin.cobaltserver.CobaltServer;
 import se.fusion1013.plugin.cobaltserver.database.DatabaseHook;
@@ -34,7 +38,7 @@ public class GameCommand {
 
     private static CommandAPICommand createTagStatsCommand() {
         return new CommandAPICommand("stats")
-                .withArguments(new PlayerArgument("player"))
+                .withArguments(new PlayerArgument("player").replaceSuggestions(ArgumentSuggestions.strings(PlayerUtil::getPlayerArguments)))
                 .executesPlayer(((sender, args) -> {
                     Player target = (Player)args[0];
                     int count = GameManager.getInstance().getTagCount(target);
@@ -61,7 +65,7 @@ public class GameCommand {
                     locale.sendMessage(CobaltServer.getInstance(), sender, "list-header", placeholders1);
 
                     for (int i = 0; i < Math.min(10, leaderboard.size()); i++) {
-                        String playerName = SQLite.getPlayerName(leaderboard.get(i));
+                        String playerName = DataManager.getInstance().getDao(IPlayerDao.class).getPlayerName(leaderboard.get(i));
                         if (!playerName.equalsIgnoreCase("")) {
                             StringPlaceholders placeholders2 = StringPlaceholders.builder()
                                     .addPlaceholder("player", playerName)
