@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>se.fusion1013.plugin</groupId>
-    <artifactId>cobaltServer</artifactId>
+    <artifactId>CobaltServer</artifactId>
     <version>0.2.1</version>
     <packaging>jar</packaging>
 
@@ -43,6 +43,14 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.3.1</version>
+                <configuration>
+                    <outputDirectory>G:\Dokument\Minecraft\Minecraft Servers\1.18.2 - Paper DEV\plugins</outputDirectory>
+                </configuration>
+            </plugin>
         </plugins>
         <resources>
             <resource>
@@ -71,13 +79,13 @@
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
-            <version>1.18.1-R0.1-SNAPSHOT</version>
+            <version>1.18.2-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>dev.jorel.CommandAPI</groupId>
+            <groupId>dev.jorel</groupId>
             <artifactId>commandapi-core</artifactId>
-            <version>8.0.0</version>
+            <version>8.2.1</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -90,7 +98,7 @@
             <artifactId>cobaltCore</artifactId>
             <version>0.1</version>
             <scope>system</scope>
-            <systemPath>G:/Dokument/Minecraft/Minecraft Servers/1.18.1 - Paper DEV/plugins/CobaltCore-shaded.jar</systemPath>
+            <systemPath>G:/Dokument/Minecraft/Minecraft Servers/1.18.2 - Paper DEV/plugins/CobaltCore-shaded.jar</systemPath>
         </dependency>
     </dependencies>
 </project>
