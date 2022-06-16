@@ -3,16 +3,20 @@ package se.fusion1013.plugin.cobaltserver.manager;
 import net.dv8tion.jda.api.entities.Activity;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerAdvancementDoneEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.inventory.meta.ItemMeta;
 import se.fusion1013.plugin.cobaltcore.CobaltCore;
 import se.fusion1013.plugin.cobaltcore.locale.LocaleManager;
 import se.fusion1013.plugin.cobaltcore.manager.Manager;
@@ -41,6 +45,23 @@ public class ChatManager extends Manager implements Listener {
     }
 
     // ----- EVENT -----
+
+    @EventHandler
+    public void anvilNameEvent(InventoryClickEvent event) {
+
+        if (event.getCurrentItem() == null) return;
+        if (event.getCurrentItem().getType() == Material.AIR) return;
+
+        if (event.getInventory().getType() == InventoryType.ANVIL) {
+            if (event.getSlotType() == InventoryType.SlotType.RESULT) {
+                ItemMeta meta = event.getCurrentItem().getItemMeta();
+                if (meta == null) return;
+
+                meta.setDisplayName(HexUtils.colorify(meta.getDisplayName()));
+                event.getCurrentItem().setItemMeta(meta);
+            }
+        }
+    }
 
     @EventHandler
     public void playerChatEvent(AsyncPlayerChatEvent event) {
