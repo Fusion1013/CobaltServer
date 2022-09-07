@@ -43,13 +43,13 @@ public class WarpDaoSQLite extends Dao implements IWarpDao {
 
     @Override
     public void deleteWarp(String name, UUID playerUUID) {
-        try {
-            Connection conn = DataManager.getInstance().getSqliteDb().getSQLConnection();
-            PreparedStatement st = conn.prepareStatement("DELETE FROM warps WHERE name = ? AND owner_uuid = ?");
+        try (
+                Connection conn = getDataManager().getSqliteDb().getSQLConnection();
+                PreparedStatement st = conn.prepareStatement("DELETE FROM warps WHERE name = ? AND owner_uuid = ?")
+        ) {
             st.setString(1, name);
             st.setString(2, playerUUID.toString());
             st.executeUpdate();
-            st.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -57,9 +57,10 @@ public class WarpDaoSQLite extends Dao implements IWarpDao {
 
     @Override
     public void saveWarps(Map<String, Warp> warps) {
-        try {
-            Connection conn = DataManager.getInstance().getSqliteDb().getSQLConnection();
-            PreparedStatement ps = conn.prepareStatement("INSERT OR REPLACE INTO warps(id, name, owner_uuid, owner_name, location_uuid, privacy) VALUES(?,?,?,?,?, ?)");
+        try (
+                Connection conn = DataManager.getInstance().getSqliteDb().getSQLConnection();
+                PreparedStatement ps = conn.prepareStatement("INSERT OR REPLACE INTO warps(id, name, owner_uuid, owner_name, location_uuid, privacy) VALUES(?,?,?,?,?, ?)");
+         ) {
             conn.setAutoCommit(false);
 
             for (Warp warp : warps.values()) {
@@ -83,7 +84,6 @@ public class WarpDaoSQLite extends Dao implements IWarpDao {
             }
             conn.commit();
             conn.setAutoCommit(true);
-            conn.close();
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
@@ -91,10 +91,11 @@ public class WarpDaoSQLite extends Dao implements IWarpDao {
 
     @Override
     public Map<String, Warp> getWarps() {
-        try {
-            Connection conn = DataManager.getInstance().getSqliteDb().getSQLConnection();
-            PreparedStatement stmt = conn.prepareStatement("SELECT * FROM warp_information");
-            ResultSet rs = stmt.executeQuery();
+        try (
+                Connection conn = DataManager.getInstance().getSqliteDb().getSQLConnection();
+                PreparedStatement stmt = conn.prepareStatement("SELECT * FROM warp_information");
+                ResultSet rs = stmt.executeQuery();
+        ) {
             Map<String, Warp> warps = new HashMap<>();
 
             while (rs.next()){
@@ -119,12 +120,10 @@ public class WarpDaoSQLite extends Dao implements IWarpDao {
                 warps.put(warp.getExpandedName(), warp);
             }
 
-            stmt.close();
-
             return warps;
 
         } catch (SQLException e){
-            CobaltServer.getInstance().getLogger().log(Level.SEVERE, "SQLException while retrieving data from database", e);
+            e.printStackTrace();
         }
 
         return null;

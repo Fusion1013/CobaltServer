@@ -105,17 +105,15 @@ public class DatabaseHook {
     public static List<UUID> getTagLeaderboard() {
         List<UUID> leaderboard = new ArrayList<>();
 
-        try {
-            Connection conn = database.getSQLConnection();
-            PreparedStatement ps = conn.prepareStatement("SELECT * FROM tag_stats ORDER BY tag_count DESC;");
-            ResultSet rs = ps.executeQuery();
-
+        try (
+                Connection conn = database.getSQLConnection();
+                PreparedStatement ps = conn.prepareStatement("SELECT * FROM tag_stats ORDER BY tag_count DESC;");
+                ResultSet rs = ps.executeQuery()
+        ) {
             while (rs.next()) {
                 UUID uuid = UUID.fromString(rs.getString("player_uuid"));
                 leaderboard.add(uuid);
             }
-
-            ps.close();
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
@@ -126,17 +124,16 @@ public class DatabaseHook {
     public static Map<UUID, Integer> getTagStats() {
         Map<UUID, Integer> tagStats = new HashMap<>();
 
-        try {
-            Connection conn = database.getSQLConnection();
-            PreparedStatement ps = conn.prepareStatement("SELECT * FROM tag_stats");
-            ResultSet rs = ps.executeQuery();
-
+        try (
+                Connection conn = database.getSQLConnection();
+                PreparedStatement ps = conn.prepareStatement("SELECT * FROM tag_stats");
+                ResultSet rs = ps.executeQuery();
+        ) {
             while (rs.next()) {
                 UUID uuid = UUID.fromString(rs.getString("player_uuid"));
                 int count = rs.getInt("tag_count");
                 tagStats.put(uuid, count);
             }
-            ps.close();
 
         } catch (SQLException ex) {
             ex.printStackTrace();
@@ -146,17 +143,17 @@ public class DatabaseHook {
     }
 
     public static void insertTagStats(Map<UUID, Integer> tagStats) {
-        try {
-            Connection conn = database.getSQLConnection();
+        try (
+                Connection conn = database.getSQLConnection();
+                PreparedStatement ps = conn.prepareStatement("INSERT OR REPLACE INTO tag_stats(player_uuid, tag_count) VALUES(?,?)");
+        ) {
             conn.setAutoCommit(false);
-            PreparedStatement ps = conn.prepareStatement("INSERT OR REPLACE INTO tag_stats(player_uuid, tag_count) VALUES(?,?)");
             for (UUID uuid : tagStats.keySet()) {
                 ps.setString(1, uuid.toString());
                 ps.setInt(2, tagStats.get(uuid));
                 ps.executeUpdate();
             }
-            conn.commit(); // TODO: DO THIS FOR ALL REQUESTS
-            ps.close();
+            conn.commit();
 
         } catch (SQLException ex) {
             ex.printStackTrace();
@@ -168,17 +165,17 @@ public class DatabaseHook {
     public static Map<UUID, String> getPlayerNicknames() {
         Map<UUID, String> nicknameMap = new HashMap<>();
 
-        try {
-            Connection conn = database.getSQLConnection();
-            PreparedStatement ps = conn.prepareStatement("SELECT * FROM player_nicknames");
-            ResultSet rs = ps.executeQuery();
+        try (
+                Connection conn = database.getSQLConnection();
+                PreparedStatement ps = conn.prepareStatement("SELECT * FROM player_nicknames");
+                ResultSet rs = ps.executeQuery();
+        ) {
 
             while (rs.next()) {
                 UUID uuid = UUID.fromString(rs.getString("uuid"));
                 String nickname = rs.getString("nickname");
                 nicknameMap.put(uuid, nickname);
             }
-            ps.close();
 
         } catch (SQLException ex) {
             ex.printStackTrace();
@@ -190,13 +187,13 @@ public class DatabaseHook {
     public static int updatePlayerNickname(UUID uuid, String nickname) {
         int rowsInserted = 0;
 
-        try {
-            Connection conn = database.getSQLConnection();
-            PreparedStatement ps = conn.prepareStatement("INSERT OR REPLACE INTO player_nicknames(uuid, nickname) VALUES(?, ?)");
+        try (
+                Connection conn = database.getSQLConnection();
+                PreparedStatement ps = conn.prepareStatement("INSERT OR REPLACE INTO player_nicknames(uuid, nickname) VALUES(?, ?)")
+        ) {
             ps.setString(1, uuid.toString());
             ps.setString(2, nickname);
             rowsInserted = ps.executeUpdate();
-            ps.close();
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
@@ -209,14 +206,13 @@ public class DatabaseHook {
     public static int removeDiscordChannel(String channelKey, DiscordManager.ChannelOption option) {
         int rowsUpdated = 0;
 
-        try {
-            Connection conn = database.getSQLConnection();
-            PreparedStatement ps = conn.prepareStatement("DELETE FROM discord_channels WHERE channel_key = ? AND option = ?");
+        try (
+                Connection conn = database.getSQLConnection();
+                PreparedStatement ps = conn.prepareStatement("DELETE FROM discord_channels WHERE channel_key = ? AND option = ?");
+        ) {
             ps.setString(1, channelKey);
             ps.setString(2, option.name());
             rowsUpdated = ps.executeUpdate();
-            ps.close();
-
         } catch (SQLException ex) {
             CobaltServer.getInstance().getLogger().log(Level.FINE, "SQLException when inserting into database: ", ex);
         }
@@ -233,9 +229,10 @@ public class DatabaseHook {
     public static String[] getDiscordChannelKeys(DiscordManager.ChannelOption option) {
         List<String> discordChannelList = new ArrayList<>();
 
-        try {
-            Connection conn = database.getSQLConnection();
-            PreparedStatement ps = conn.prepareStatement("SELECT * FROM discord_channels WHERE option = ?");
+        try (
+                Connection conn = database.getSQLConnection();
+                PreparedStatement ps = conn.prepareStatement("SELECT * FROM discord_channels WHERE option = ?");
+        ) {
             ps.setString(1, option.name());
             ResultSet rs = ps.executeQuery();
 
@@ -243,7 +240,7 @@ public class DatabaseHook {
                 String channelKey = rs.getString("channel_key");
                 discordChannelList.add(channelKey);
             }
-            ps.close();
+            rs.close();
 
         } catch (SQLException ex) {
             CobaltServer.getInstance().getLogger().log(Level.FINE, "SQLException when inserting into database: ", ex);
@@ -261,14 +258,14 @@ public class DatabaseHook {
     public static int insertDiscordChannel(String channelKey, DiscordManager.ChannelOption option) {
         int rowsInserted = 0;
 
-        try {
-            Connection conn = database.getSQLConnection();
-            PreparedStatement ps = conn.prepareStatement("INSERT INTO discord_channels(channel_key, option) VALUES(?, ?)");
+        try (
+                Connection conn = database.getSQLConnection();
+                PreparedStatement ps = conn.prepareStatement("INSERT INTO discord_channels(channel_key, option) VALUES(?, ?)");
+        ) {
             ps.setString(1, channelKey);
             ps.setString(2, option.name());
 
             rowsInserted = ps.executeUpdate();
-            ps.close();
         } catch (SQLException ex) {
             CobaltServer.getInstance().getLogger().log(Level.FINE, "SQLException when inserting into database: ", ex);
         }
@@ -280,9 +277,10 @@ public class DatabaseHook {
     // ----- PLAYERS -----
 
     public static PlayerUtil.PlayerStorage getPlayerStorage(String playerName) {
-        try {
-            Connection conn = database.getSQLConnection();
-            PreparedStatement stmt = conn.prepareStatement("SELECT * FROM player_information WHERE name = ?");
+        try (
+                Connection conn = database.getSQLConnection();
+                PreparedStatement stmt = conn.prepareStatement("SELECT * FROM player_information WHERE name = ?");
+        ) {
             stmt.setString(1, playerName);
             ResultSet rs = stmt.executeQuery();
 
@@ -307,6 +305,8 @@ public class DatabaseHook {
                 return storage;
             }
 
+            rs.close();
+
         } catch (SQLException e){
             CobaltServer.getInstance().getLogger().log(Level.SEVERE, "SQLException while retrieving data from database", e);
         }
@@ -318,13 +318,13 @@ public class DatabaseHook {
         DataManager.getInstance().getDao(IPlayerDao.class).insertPlayer(player);
         DataManager.getInstance().getDao(ILocationDao.class).insertLocation(player.getUniqueId(), player.getLocation());
 
-        try {
-            Connection conn = database.getSQLConnection();
-            PreparedStatement ps = conn.prepareStatement("INSERT OR REPLACE INTO player_leave_times(uuid, last_left) VALUES(?, datetime('now','localtime'))");
+        try (
+                Connection conn = database.getSQLConnection();
+                PreparedStatement ps = conn.prepareStatement("INSERT OR REPLACE INTO player_leave_times(uuid, last_left) VALUES(?, datetime('now','localtime'))");
+        ) {
             ps.setString(1, player.getUniqueId().toString());
 
             ps.executeUpdate();
-            ps.close();
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
@@ -334,13 +334,13 @@ public class DatabaseHook {
         DataManager.getInstance().getDao(IPlayerDao.class).insertPlayer(player);
         DataManager.getInstance().getDao(ILocationDao.class).insertLocation(player.getUniqueId(), player.getLocation());
 
-        try {
-            Connection conn = database.getSQLConnection();
-            PreparedStatement ps = conn.prepareStatement("INSERT OR REPLACE INTO player_join_times(uuid, last_joined) VALUES(?, datetime('now','localtime'))");
+        try (
+                Connection conn = database.getSQLConnection();
+                PreparedStatement ps = conn.prepareStatement("INSERT OR REPLACE INTO player_join_times(uuid, last_joined) VALUES(?, datetime('now','localtime'))");
+        ) {
             ps.setString(1, player.getUniqueId().toString());
 
             ps.executeUpdate();
-            ps.close();
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
