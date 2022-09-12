@@ -3,6 +3,7 @@ package se.fusion1013.plugin.cobaltserver.commands.message;
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.arguments.ArgumentSuggestions;
+import dev.jorel.commandapi.arguments.EntitySelector;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.GreedyStringArgument;
 import org.bukkit.entity.Entity;
@@ -24,7 +25,7 @@ public class MessageCommand {
 
         new CommandAPICommand("msg")
                 .withAliases("tell", "w")
-                .withArguments(new EntitySelectorArgument("targets", EntitySelectorArgument.EntitySelector.MANY_ENTITIES).replaceSuggestions(ArgumentSuggestions.strings(PlayerUtil::getPlayerArguments)))
+                .withArguments(new EntitySelectorArgument("targets", EntitySelector.MANY_ENTITIES).replaceSuggestions(ArgumentSuggestions.strings(PlayerUtil::getPlayerArguments)))
                 .withArguments(new GreedyStringArgument("message"))
                 .executes(((sender, args) -> {
                     Collection<Entity> targets = (Collection<Entity>) args[0];

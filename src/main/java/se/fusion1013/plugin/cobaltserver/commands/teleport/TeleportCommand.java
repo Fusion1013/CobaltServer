@@ -67,7 +67,7 @@ public class TeleportCommand {
     private static CommandAPICommand createTpHereCommand() {
         return new CommandAPICommand("tphere")
                 .withPermission("cobalt.commands.teleport")
-                .withArguments(new EntitySelectorArgument("targets", EntitySelectorArgument.EntitySelector.MANY_ENTITIES).replaceSuggestions(ArgumentSuggestions.strings(PlayerUtil::getPlayerArguments)))
+                .withArguments(new EntitySelectorArgument("targets", EntitySelector.MANY_ENTITIES).replaceSuggestions(ArgumentSuggestions.strings(PlayerUtil::getPlayerArguments)))
                 .executesEntity(((sender, args) -> {
                     @SuppressWarnings("unchecked")
                     Collection<Entity> entities = (Collection<Entity>) args[0];
@@ -98,7 +98,7 @@ public class TeleportCommand {
         return new CommandAPICommand("teleport")
                 .withAliases("tp")
                 .withPermission("cobalt.commands.teleport")
-                .withArguments(new EntitySelectorArgument("targets", EntitySelectorArgument.EntitySelector.MANY_ENTITIES).replaceSuggestions(ArgumentSuggestions.strings(PlayerUtil::getPlayerArguments)))
+                .withArguments(new EntitySelectorArgument("targets", EntitySelector.MANY_ENTITIES).replaceSuggestions(ArgumentSuggestions.strings(PlayerUtil::getPlayerArguments)))
                 .withArguments(new EntitySelectorArgument("destination").replaceSuggestions(ArgumentSuggestions.strings(PlayerUtil::getPlayerArguments)))
                 .executes(((sender, args) -> {
                     @SuppressWarnings("unchecked")
@@ -127,7 +127,7 @@ public class TeleportCommand {
         return new CommandAPICommand("teleport")
                 .withAliases("tp", "tppos")
                 .withPermission("cobalt.commands.teleport")
-                .withArguments(new EntitySelectorArgument("targets", EntitySelectorArgument.EntitySelector.MANY_ENTITIES).replaceSuggestions(ArgumentSuggestions.strings(PlayerUtil::getPlayerArguments)))
+                .withArguments(new EntitySelectorArgument("targets", EntitySelector.MANY_ENTITIES).replaceSuggestions(ArgumentSuggestions.strings(PlayerUtil::getPlayerArguments)))
                 .withArguments(new LocationArgument("location"))
                 .executes(((sender, args) -> {
                     @SuppressWarnings("unchecked")
@@ -143,7 +143,7 @@ public class TeleportCommand {
         return new CommandAPICommand("teleport")
                 .withAliases("tp", "tppos")
                 .withPermission("cobalt.commands.teleport")
-                .withArguments(new EntitySelectorArgument("targets", EntitySelectorArgument.EntitySelector.MANY_ENTITIES).replaceSuggestions(ArgumentSuggestions.strings(PlayerUtil::getPlayerArguments)))
+                .withArguments(new EntitySelectorArgument("targets", EntitySelector.MANY_ENTITIES).replaceSuggestions(ArgumentSuggestions.strings(PlayerUtil::getPlayerArguments)))
                 .withArguments(new LocationArgument("location"))
                 .withArguments(new RotationArgument("rotation"))
                 .executes(((sender, args) -> {
@@ -162,7 +162,7 @@ public class TeleportCommand {
     private static CommandAPICommand createTpManyToPosFacingLocationCommand() {
         return new CommandAPICommand("facing")
                 .withPermission("cobalt.commands.teleport")
-                .withArguments(new EntitySelectorArgument("targets", EntitySelectorArgument.EntitySelector.MANY_ENTITIES).replaceSuggestions(ArgumentSuggestions.strings(PlayerUtil::getPlayerArguments)))
+                .withArguments(new EntitySelectorArgument("targets", EntitySelector.MANY_ENTITIES).replaceSuggestions(ArgumentSuggestions.strings(PlayerUtil::getPlayerArguments)))
                 .withArguments(new LocationArgument("location"))
                 .withArguments(new LiteralArgument("facing"))
                 .withArguments(new LocationArgument("facingLocation"))
@@ -181,10 +181,10 @@ public class TeleportCommand {
     private static CommandAPICommand createTpManyToPosFacingEntityCommand() {
         return new CommandAPICommand("facing")
                 .withPermission("cobalt.commands.teleport")
-                .withArguments(new EntitySelectorArgument("targets", EntitySelectorArgument.EntitySelector.MANY_ENTITIES).replaceSuggestions(ArgumentSuggestions.strings(PlayerUtil::getPlayerArguments)))
+                .withArguments(new EntitySelectorArgument("targets", EntitySelector.MANY_ENTITIES).replaceSuggestions(ArgumentSuggestions.strings(PlayerUtil::getPlayerArguments)))
                 .withArguments(new LocationArgument("location"))
                 .withArguments(new LiteralArgument("facing"))
-                .withArguments(new EntitySelectorArgument("facingEntity", EntitySelectorArgument.EntitySelector.ONE_ENTITY).replaceSuggestions(ArgumentSuggestions.strings(PlayerUtil::getPlayerArguments)))
+                .withArguments(new EntitySelectorArgument("facingEntity", EntitySelector.ONE_ENTITY).replaceSuggestions(ArgumentSuggestions.strings(PlayerUtil::getPlayerArguments)))
                 .executes(((sender, args) -> {
                     @SuppressWarnings("unchecked")
                     Collection<Entity> entities = (Collection<Entity>) args[0];
